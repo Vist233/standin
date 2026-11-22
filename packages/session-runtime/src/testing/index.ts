@@ -9,7 +9,7 @@ import { createFakeSecrets } from "@vesper/secrets/testing";
 import { createFileSessionStore } from "@vesper/session-store";
 import type { FauxClient, FauxScript } from "sakura-agent/testing";
 import { createFauxClient } from "sakura-agent/testing";
-import { workspaceEnvironment } from "../run-command.ts";
+import { spawnInWorkspace, workspaceEnvironment } from "../run-command.ts";
 import { createSessionRuntime, type SessionRuntime } from "../runtime.ts";
 import type { SessionRuntimeDeps, WorkspaceInfo, WorkspaceProvider } from "../types.ts";
 
@@ -60,6 +60,7 @@ export function createFakeWorkspaces(
           runs.push(call);
           return onRun.handler(call);
         },
+        spawn: (command, options) => spawnInWorkspace({ workspaceId: sessionId, filesDir, ...extra }, command, options),
       };
     },
     async destroy(sessionId) {
@@ -135,7 +136,25 @@ export function loadPlugins(...dirs: string[]): LoadedPlugin[] {
 }
 
 /** The text of the last user message of a request: how scripts can answer by content. */
+/** The framework's own note at the end of every request (sakura-agent's limits plugin: "[Limits: 3 of 15 minutes used.]"), not something the person wrote. */
+export const isFrameworkNote = (text: string): boolean => /^\[Limits: [^\]]*\]$/.test(text);
+
+/** The texts of the user messages a scripted model received, without the framework's note. */
+export function userTexts(request: { messages: { role: string; content: { type: string; text?: string }[] }[] }): string[] {
+  return request.messages
+    .filter((m) => m.role === "user")
+    .map((m) => m.content.map((c) => (c.type === "text" ? (c.text ?? "") : "")).join(""))
+    .filter((text) => !isFrameworkNote(text));
+}
+
+/** The last message a scripted model received that is not the framework's note (a tool result, a signal, the person's text). */
+export function lastMessage<M extends { role: string; content: { type: string; text?: string }[] }>(request: { messages: M[] }): M | undefined {
+  return [...request.messages]
+    .reverse()
+    .find((m) => !(m.role === "user" && isFrameworkNote(m.content.map((c) => (c.type === "text" ? (c.text ?? "") : "")).join(""))));
+}
+
+/** The last thing the person (or a signal) wrote. */
 export function lastUserText(request: { messages: { role: string; content: { type: string; text?: string }[] }[] }): string {
-  const user = [...request.messages].reverse().find((m) => m.role === "user");
-  return (user?.content ?? []).map((c) => (c.type === "text" ? (c.text ?? "") : "")).join("");
+  return userTexts(request).at(-1) ?? "";
 }

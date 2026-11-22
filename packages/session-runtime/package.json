@@ -20,6 +20,6 @@
     "@vesper/secrets": "*",
     "@vesper/session-store": "*",
     "@vesper/workspace-client": "*",
-    "sakura-agent": "0.1.2"
+    "sakura-agent": "0.2.3"
   }
 }

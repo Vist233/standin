@@ -109,6 +109,8 @@ export interface WorkspaceInfo {
    * preferences). Commands get it as XDG_CONFIG_HOME, XDG_DATA_HOME and XDG_STATE_HOME below this directory.
    */
   readonly appDataDir: string;
+  /** The display's D-Bus session where desktop programs publish their widgets (absent when the desktop has none). */
+  readonly accessibilityBus?: string;
 }
 
 export type WorkspaceState =

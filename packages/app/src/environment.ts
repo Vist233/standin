@@ -1,5 +1,6 @@
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { TEMP_MAIL_VARIABLES, tempMailSettings } from "@vesper/connectors";
 import { OgbError } from "@vesper/contracts";
 
 /** The name of the variable that carries the model key. The key is read from the environment only and never written anywhere. */
@@ -24,6 +25,13 @@ export interface AppEnvironment {
   /** Optional waiting limits in minutes. Unset (the default) means wait for ever. */
   waits: { humanWaitMinutes?: number; takeoverMaxMinutes?: number };
   limits: { turnsPerRun: number; tokensPerRun?: number; runSeconds: number };
+  /**
+   * Real mail (docs/25). `tempMail`: the owner's cloudflare_temp_email deployment (`OGB_TEMP_MAIL_URL`, `OGB_TEMP_MAIL_DOMAIN`): every bot
+   * gets its own address. `to`: the person's own address (`OGB_MAIL_TO`): the mail channel writes there from `channelName`@domain.
+   */
+  mail: { tempMail?: { baseUrl: string; domain: string }; to?: string; channelName: string; outlook: boolean; gmail: boolean };
+  /** The hook relay (docs/26 3.4, `OGB_HOOK_RELAY_URL`; its key `OGB_HOOK_RELAY_KEY` is a secret): outside services' webhooks are pulled from it. */
+  hookRelayUrl?: string;
 }
 
 /** Command Code and the DeepSeek flash models take 1,000,000 tokens (the owner's decision, 2026-11-13). `OGB_MODEL_CONTEXT_WINDOW` or a models.json changes it. */
@@ -91,6 +99,24 @@ export function parseEnvironment(env: Env, here = dirname(fileURLToPath(import.m
   const takeoverMax = optionalMinutes(env, "OGB_TAKEOVER_MAX_MINUTES", problems);
   if (takeoverMax !== undefined) waits.takeoverMaxMinutes = takeoverMax;
   const tokensPerRun = whole(env, "OGB_RUN_TOKENS", 0, 1, Number.MAX_SAFE_INTEGER, problems);
+  let tempMail: { baseUrl: string; domain: string } | undefined;
+  try {
+    tempMail = tempMailSettings(env);
+  } catch (error) {
+    problems.push((error as Error).message);
+  }
+  // The deployment's passwords are secrets like the model key: taken out of the environment, resolved by reference.
+  if (tempMail) for (const name of [TEMP_MAIL_VARIABLES.admin, TEMP_MAIL_VARIABLES.sitePassword]) if (!extra.includes(name)) extra.push(name);
+  // The person's Gmail (plugin mail-gmail): its app password is a secret like the others.
+  const gmail = Boolean(env.OGB_GMAIL_ADDRESS?.trim());
+  if (gmail && !extra.includes("OGB_GMAIL_APP_PASSWORD")) extra.push("OGB_GMAIL_APP_PASSWORD");
+  const hookRelayUrl = env.OGB_HOOK_RELAY_URL?.trim() || undefined;
+  if (hookRelayUrl !== undefined && !/^https:\/\/[^\s/]+/.test(hookRelayUrl)) problems.push("OGB_HOOK_RELAY_URL must be an https address");
+  if (hookRelayUrl && !extra.includes("OGB_HOOK_RELAY_KEY")) extra.push("OGB_HOOK_RELAY_KEY");
+  const mailTo = env.OGB_MAIL_TO?.trim() || undefined;
+  if (mailTo !== undefined && !/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(mailTo)) problems.push("OGB_MAIL_TO must be one e-mail address");
+  const channelName = env.OGB_MAIL_CHANNEL_NAME?.trim() || "vesper";
+  if (!/^[a-z0-9][a-z0-9._-]{0,63}$/.test(channelName)) problems.push("OGB_MAIL_CHANNEL_NAME must be lower-case letters, digits, . _ -");
   const config: AppEnvironment = {
     host: env.OGB_HOST || DEFAULTS.host,
     port: whole(env, "OGB_PORT", DEFAULTS.port, 0, 65_535, problems),
@@ -106,12 +132,15 @@ export function parseEnvironment(env: Env, here = dirname(fileURLToPath(import.m
       contextWindow: whole(env, "OGB_MODEL_CONTEXT_WINDOW", DEFAULTS.contextWindow, 1_000, 10_000_000, problems),
     },
     extraSecretVariables: extra,
+    // The person's Outlook (plugin mail-outlook) is offered when the owner's app registration is named (`OGB_OUTLOOK_CLIENT_ID`).
+    mail: { ...(tempMail ? { tempMail } : {}), ...(mailTo ? { to: mailTo } : {}), channelName, outlook: Boolean(env.OGB_OUTLOOK_CLIENT_ID?.trim()), gmail },
     waits,
     limits: {
       turnsPerRun: whole(env, "OGB_RUN_TURNS", 40, 1, Number.MAX_SAFE_INTEGER, problems),
       ...(tokensPerRun === 0 ? {} : { tokensPerRun }),
       runSeconds: whole(env, "OGB_RUN_SECONDS", 900, 1, 86_400, problems),
     },
+    ...(hookRelayUrl ? { hookRelayUrl } : {}),
   };
   if (problems.length > 0) throw new OgbError("invalid_input", `the environment is not valid:\n- ${problems.join("\n- ")}`);
   return config;

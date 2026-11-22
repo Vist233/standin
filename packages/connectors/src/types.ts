@@ -31,6 +31,12 @@ export interface MailDraft {
   body: string;
 }
 
+/** Where a watch continues from, and how it reports its position (to be kept on disk by the caller). */
+export interface MailWatchOptions {
+  after?: string | undefined;
+  onCursor?: ((cursor: string) => void) | undefined;
+}
+
 /** Stops a watch. Calling it twice is harmless. */
 export type Stop = () => void;
 
@@ -44,8 +50,12 @@ export interface MailReader {
   list(query: MailQuery): Promise<MailSummary[]>;
   /** Marks the message as read. Unknown id: rejects with kind `not_found`. */
   read(id: string): Promise<MailMessage>;
-  /** Calls `onMail` once for each message that arrives after the watch started (never for mail that was already there). */
-  watch(onMail: (mail: MailSummary) => void): Stop;
+  /**
+   * Calls `onMail` once for each message that arrives after the watch started (never for mail that was already there). With `after`
+   * (a cursor this provider gave earlier through `onCursor`) it first reports what arrived since that point, so mail that came while
+   * the box was down is not lost. A cursor is the provider's own text; callers only keep it.
+   */
+  watch(onMail: (mail: MailSummary) => void, options?: MailWatchOptions): Stop;
 }
 
 export interface MailSender {
@@ -75,9 +85,12 @@ export interface CalendarProvider {
   watch(onEvent: (event: CalendarEvent) => void): Stop;
 }
 
-/** An optional extra of providers that can make addresses (a domain's mail service, a mail API). The host offers "create an address" only when one is installed. */
+/**
+ * An optional extra of providers that can make addresses (a domain's mail service, a mail API). `credential` is what reaches the new
+ * address (a token): the caller keeps it where it keeps its own credentials (a plugin: its private data directory) and never shows it.
+ */
 export interface Provisioner {
-  create(name: string): Promise<{ address: string; secretReference: string }>;
+  create(name: string): Promise<{ address: string; credential: string }>;
 }
 
 /** What a provider plugin hands over: any of the parts it supports. */

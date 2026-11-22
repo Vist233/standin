@@ -45,7 +45,7 @@ export interface Harness {
 
 export function harness(
   env: Record<string, string | undefined> = {},
-  options: { deskDown?: boolean; backendSearchPath?: string; processEnv?: boolean } = {},
+  options: { deskDown?: boolean; processEnv?: boolean; fetch?: typeof fetch } = {},
 ): Harness {
   const dataDir = mkdtempSync(join(tmpdir(), "ogb-app-"));
   mkdirSync(join(dataDir, "ws"), { recursive: true });
@@ -68,7 +68,7 @@ export function harness(
   const app = createApp({
     env: options.processEnv ? process.env : given,
     write: (line) => void logs.push(line),
-    deps: { workspaceHost: host, createClient: model.create, backendSearchPath: options.backendSearchPath ?? "" }, // no program is looked up on the machine's own PATH
+    deps: { workspaceHost: host, createClient: model.create, ...(options.fetch ? { fetch: options.fetch } : {}) },
   });
   return {
     app,

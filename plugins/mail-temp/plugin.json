@@ -1,0 +1,15 @@
+{
+  "name": "mail-temp",
+  "version": "0.1.0",
+  "description": "The bot's own mail address on the owner's domain (a cloudflare_temp_email deployment): made the first time, kept for the bot. Read, send, and new mail as a signal. Needs OGB_TEMP_MAIL_URL, OGB_TEMP_MAIL_DOMAIN and the secret OGB_TEMP_MAIL_ADMIN.",
+  "license": "MIT",
+  "extensions": {
+    "vesper": {
+      "tools": "dist/tools.js",
+      "sources": "dist/sources.js",
+      "promptSection": "prompt.md",
+      "effects": ["read", "irreversible"],
+      "defaultEnabled": false
+    }
+  }
+}

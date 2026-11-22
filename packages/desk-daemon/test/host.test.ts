@@ -35,6 +35,28 @@ const waitRunning = (host: DeskHost, id: string, timeoutMs = 10_000) =>
     timeoutMs,
   );
 
+describe("the accessibility bus", () => {
+  it("is started per display when configured, its address is in the workspace's info, and it ends with the workspace", async () => {
+    const { fileURLToPath } = await import("node:url");
+    const bus = { command: process.execPath, args: [fileURLToPath(new URL("../src/testing/stubs/fake-dbus.mjs", import.meta.url))] };
+    const host = open({ accessibilityBus: bus });
+    const info = await host.ensure({ workspaceId: "w1" });
+    expect(info.accessibilityBus).toMatch(/^unix:path=.+a11y-bus$/);
+    const socket = (info.accessibilityBus as string).slice("unix:path=".length);
+    expect(existsSync(socket)).toBe(true);
+    await host.shutdown();
+    await eventually(
+      () => existsSync(socket),
+      (present) => !present,
+      5000,
+    );
+  });
+
+  it("is absent when not configured, and so is its address", async () => {
+    expect((await open().ensure({ workspaceId: "w1" })).accessibilityBus).toBeUndefined();
+  });
+});
+
 describe("kill tests: every process of a workspace comes back", () => {
   it("Chromium: restarted, same profile, no orphan, the stale lock does not block it", async () => {
     const host = open();

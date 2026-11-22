@@ -12,6 +12,6 @@
   "dependencies": {
     "@vesper/contracts": "*",
     "@vesper/secrets": "*",
-    "sakura-agent": "0.1.2"
+    "sakura-agent": "0.2.3"
   }
 }

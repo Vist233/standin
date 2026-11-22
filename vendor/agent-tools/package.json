@@ -1,0 +1,74 @@
+{
+  "name": "sakura-agent-tools",
+  "version": "0.1.0",
+  "description": "Tools for agents: browser and computer (the agent writes code in a session that stays) and handoff (agents share checked work)",
+  "type": "module",
+  "license": "MIT",
+  "exports": {
+    "./browser": {
+      "types": "./dist/browser/index.d.ts",
+      "default": "./dist/browser/index.js"
+    },
+    "./computer": {
+      "types": "./dist/computer/index.d.ts",
+      "default": "./dist/computer/index.js"
+    },
+    "./handoff": {
+      "types": "./dist/handoff/index.d.ts",
+      "default": "./dist/handoff/index.js"
+    },
+    "./core": {
+      "types": "./dist/core/code-tool.d.ts",
+      "default": "./dist/core/code-tool.js"
+    }
+  },
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "test": "node --test browser/test/*.test.ts computer/test/*.test.ts handoff/test/*.test.ts",
+    "test:desktop": "computer/test/desktop/in-box.sh",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "bench:browser": "node browser/bench/run.ts",
+    "build": "node scripts/build.mjs",
+    "prepack": "node scripts/build.mjs"
+  },
+  "dependencies": {
+    "playwright-core": "^1.64.0",
+    "step-by-step-handoff-mcp": "0.3.0"
+  },
+  "peerDependencies": {
+    "sakura-agent": ">=0.1.0"
+  },
+  "peerDependenciesMeta": {
+    "sakura-agent": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.0"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vist233/sakura-agent-tools.git"
+  },
+  "keywords": [
+    "agent",
+    "browser",
+    "playwright",
+    "computer-use",
+    "accessibility",
+    "llm",
+    "tools"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  }
+}

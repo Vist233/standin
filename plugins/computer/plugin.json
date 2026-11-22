@@ -1,13 +1,15 @@
 {
   "name": "computer",
   "version": "0.1.0",
-  "description": "The workspace's desktop (programs, dialogs, drawing by hand) for the agent and its sub-agents.",
+  "description": "The workspace's desktop, driven by Python: the accessibility tree, the picture and the input (agent-tools). One call at a time.",
   "license": "MIT",
   "extensions": {
     "vesper": {
       "tools": "dist/tools.js",
       "promptSection": "prompt.md",
-      "effects": ["exec"],
+      "effects": [
+        "exec"
+      ],
       "defaultEnabled": true
     }
   }

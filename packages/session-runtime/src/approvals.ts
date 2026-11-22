@@ -19,9 +19,23 @@ export class ApprovalBook {
   private readonly requests = new Map<string, ApprovalRequest & { key: string }>();
   private readonly granted = new Set<string>();
 
+  /**
+   * The same call is the same request whatever order the model writes the arguments in: after an approval the agent repeats the call,
+   * and a model rarely keeps key order (owner case tasks-and-people, 2026-11-17: the repeat opened a second request and nothing was sent).
+   */
   static keyOf(tool: string, args: unknown): string {
+    const stable = (value: unknown): unknown =>
+      Array.isArray(value)
+        ? value.map(stable)
+        : value !== null && typeof value === "object"
+          ? Object.fromEntries(
+              Object.entries(value as Record<string, unknown>)
+                .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+                .map(([k, v]) => [k, stable(v)]),
+            )
+          : value;
     return createHash("sha256")
-      .update(JSON.stringify([tool, args ?? null]))
+      .update(JSON.stringify([tool, stable(args ?? null)]))
       .digest("hex");
   }
 
@@ -62,6 +76,8 @@ export interface GateOptions {
   book: ApprovalBook;
   /** Tells the person (journal event) that approval is needed. */
   announce(type: string, payload: unknown): Promise<void>;
+  /** Yolo: while true, an `ask` tool runs without asking (`never` still refuses: it is not offered here at all). */
+  bypass?: () => boolean;
 }
 
 /**
@@ -74,7 +90,7 @@ export function gate(tool: Tool, options: GateOptions): Tool {
     ...tool,
     async execute(args, context) {
       if (options.mode === "never") return { ...text(`The tool '${tool.name}' is not allowed here.`, true), details: { outcome: "refused" } };
-      if (options.book.consume(tool.name, args)) return tool.execute(args, context);
+      if (options.bypass?.() || options.book.consume(tool.name, args)) return tool.execute(args, context);
       const { request, isNew } = options.book.request(tool.name, args);
       if (isNew) await options.announce("approval.requested", { id: request.id, tool: tool.name, args });
       return {

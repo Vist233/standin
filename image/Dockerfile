@@ -102,7 +102,9 @@ COPY scripts ./scripts
 COPY packages ./packages
 COPY plugins ./plugins
 COPY test ./test
+COPY relay ./relay
 COPY image ./image
+COPY vendor/agent-tools ./vendor/agent-tools
 RUN npm ci --registry="${NPM_REGISTRY}"
 # The first-party plugins are bundled to dist/ (the plugin host loads them from a cache that has no node_modules); the check builds them too, this makes it independent of RUN_CHECK.
 RUN node scripts/build-plugins.mjs

@@ -31,7 +31,8 @@
     "test:all": "sh scripts/test-all.sh"
   },
   "dependencies": {
-    "sakura-agent": "0.1.2"
+    "sakura-agent": "0.2.3",
+    "sakura-agent-tools": "file:vendor/agent-tools"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.6.4",

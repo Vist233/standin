@@ -1,6 +1,7 @@
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import type { Channel, Outgoing } from "@vesper/contracts";
 import { createFileSessionStore } from "@vesper/session-store";
 import { afterEach, describe, expect, it } from "vitest";
 import { editPerson, PERSON_MAX } from "../src/person.ts";
@@ -91,9 +92,10 @@ describe("the person's profile", () => {
 describe("a bot that schedules itself and knows the person", () => {
   it("adds a job with the tool, is woken by it in the same conversation, and every run sees the shared profile", async () => {
     let clock = T0;
-    const notices: { id: string; title: string; text: string }[] = [];
+    const notices: Outgoing[] = [];
+    const mail: Channel = { name: "mail", deliver: async (message) => void notices.push(message) };
     const r = createRig({
-      runtime: { now: () => clock, scheduleIntervalMs: 30, notify: (id, notice) => void notices.push({ id, ...notice }) },
+      runtime: { now: () => clock, scheduleIntervalMs: 30, channels: [mail] },
       profiles: { default: "general", profiles: { general: { plugins: [], alwaysDeclaredTools: ["schedule", "remember_person"] } } },
       script: (request, index) => {
         if (index === 0) return { toolCalls: [{ name: "schedule", args: { action: "add", when: "in 5m", prompt: "Tell the person the price." } }] };
@@ -126,9 +128,11 @@ describe("a bot that schedules itself and knows the person", () => {
     expect(woke).toBeDefined();
     expect(JSON.stringify(events.filter((e) => e.type === "message.assistant").at(-1)?.payload)).toContain("profile seen, skill seen");
     expect((await r.runtime.list()).find((s) => s.id === bot.id)?.next).toBeUndefined(); // the one-shot job is gone
-    // The scheduled run's reply is a notice for the person: in the bot's info (the page) and through the delivery port.
+    // The scheduled run's reply is a notice for the person: on the page (the bot's info) and on their other channels.
     await expect.poll(async () => (await r.runtime.list()).find((s) => s.id === bot.id)?.notice?.text).toContain("price: 42");
-    await expect.poll(() => notices.length).toBe(1);
-    expect(notices).toEqual([{ id: bot.id, title: "Scout", at: expect.any(Number), text: expect.stringContaining("price: 42") }]);
+    await expect.poll(() => notices.filter((n) => n.kind === "notice").length).toBe(1);
+    expect(notices.filter((n) => n.kind === "notice")).toEqual([
+      { sessionId: bot.id, from: "Scout", kind: "notice", at: expect.any(Number), text: expect.stringContaining("price: 42") },
+    ]);
   });
 });

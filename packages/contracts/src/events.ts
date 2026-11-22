@@ -29,6 +29,7 @@ export const CORE_EVENT_TYPES = [
   "session.summary",
   "session.notice",
   "schedule.changed",
+  "safety.yolo",
 ] as const;
 
 /*

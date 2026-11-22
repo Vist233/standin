@@ -1,53 +1,37 @@
-import { existsSync, statSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 import type { StartupLine } from "@vesper/contracts";
-import { workspaceEnvironment } from "@vesper/session-runtime";
 
-/** Where the image keeps the owner's desktop kit (a vendored copy); the same path the computer plugin defaults to. */
-const KIT_OBSERVE = ["image", "vendor", "sandbox-tools", "desktop", "refagent-tools", "tools", "observe.py"];
-const WORKER = "sakura-browser-worker";
+/** Where agent-tools keeps the runners of the browser and computer tools (scripts/sync-agent-tools.sh copies it to vendor/). */
+const BROWSER_RUNNER = ["vendor", "agent-tools", "dist", "browser", "runner.js"];
+const DESKTOP_RUNNER = ["vendor", "agent-tools", "dist", "computer", "runner", "runner.py"];
 
 export interface BackendReport {
-  worker: boolean;
-  kit: boolean;
+  browser: boolean;
+  desktop: boolean;
   lines: StartupLine[];
 }
 
-function isExecutableFile(path: string): boolean {
-  try {
-    return statSync(path).isFile();
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Looks, without starting anything, for the programs the real browser and desktop backends call, so the start-up line can say
- * what will not work. Commands run for a workspace get a fixed PATH, so that is the PATH searched for the worker.
- */
-export function checkBackends(appRoot: string, options: { searchPath?: string } = {}): BackendReport {
-  // The search path is a parameter so that tests do not depend on what is installed on the machine they run on.
-  const path = options.searchPath ?? workspaceEnvironment({ workspaceId: "check", filesDir: appRoot }).PATH ?? "";
-  const worker = path
-    .split(":")
-    .filter(Boolean)
-    .some((dir) => isExecutableFile(join(dir, WORKER)));
-  const kit = existsSync(join(appRoot, ...KIT_OBSERVE));
+/** Looks, without starting anything, for the runners of the browser and computer tools, so the start-up line can say what will not work. */
+export function checkBackends(appRoot: string): BackendReport {
+  const browser = existsSync(join(appRoot, ...BROWSER_RUNNER));
+  const desktop = existsSync(join(appRoot, ...DESKTOP_RUNNER));
   return {
-    worker,
-    kit,
+    browser,
+    desktop,
     lines: [
-      worker
-        ? { level: "info", text: `browser tool: ${WORKER} found` }
+      browser
+        ? { level: "info", text: "browser tool: the agent-tools runner is present" }
         : {
             level: "warn",
-            text: `browser tool: ${WORKER} is not installed in this image, so the browser tool will answer with an error (agent-browser alone is not enough)`,
+            text: "browser tool: vendor/agent-tools is missing (run scripts/sync-agent-tools.sh), so the browser tool will answer with an error",
           },
-      kit
-        ? { level: "info", text: "desktop tool: the desktop kit is present" }
-        : { level: "warn", text: "desktop tool: the desktop kit is missing, so the desktop tool will answer with an error" },
-      // Only where the kit is used: without the accessibility bus the desktop tool can click and type but cannot read the interface.
-      ...(kit ? [{ level: "info" as const, text: "desktop accessibility bus: not started (the desktop tool cannot read the interface by name yet)" }] : []),
+      desktop
+        ? { level: "info", text: "computer tool: the agent-tools runner is present" }
+        : {
+            level: "warn",
+            text: "computer tool: vendor/agent-tools is missing (run scripts/sync-agent-tools.sh), so the computer tool will answer with an error",
+          },
     ],
   };
 }

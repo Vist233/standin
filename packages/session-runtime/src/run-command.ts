@@ -1,6 +1,6 @@
 import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
-import { OgbError, type RunOptions, type RunResult } from "@vesper/contracts";
+import { OgbError, type RunOptions, type RunResult, type WorkspaceProcess } from "@vesper/contracts";
 
 export interface WorkspaceTarget {
   workspaceId: string;
@@ -9,6 +9,8 @@ export interface WorkspaceTarget {
   cdpUrl?: string | undefined;
   /** Shared settings and data of desktop programs (WorkspaceInfo.appDataDir). */
   appDataDir?: string | undefined;
+  /** The display's accessibility bus (WorkspaceInfo.accessibilityBus). */
+  accessibilityBus?: string | undefined;
 }
 
 /** Names a caller cannot set through `RunOptions.env`: they are the workspace's own. */
@@ -23,6 +25,9 @@ const PROTECTED = new Set([
   "XDG_CONFIG_HOME",
   "XDG_DATA_HOME",
   "XDG_STATE_HOME",
+  "DBUS_SESSION_BUS_ADDRESS",
+  "GTK_MODULES",
+  "NO_AT_BRIDGE",
 ]);
 const ENV_NAME = /^[A-Z][A-Z0-9_]{0,63}$/;
 const DEFAULT_TIMEOUT_MS = 30_000;
@@ -42,6 +47,8 @@ export function workspaceEnvironment(target: WorkspaceTarget, extra: Record<stri
     PATH: "/usr/local/bin:/usr/bin:/bin",
     HOME: target.filesDir,
     LANG: "C.UTF-8",
+    // the box's own zone: without it a bot's `date` says UTC while its scheduled jobs run in the container's zone
+    ...(process.env.TZ ? { TZ: process.env.TZ } : {}),
     OGB_WORKSPACE_ID: target.workspaceId,
     OGB_FILES_DIR: target.filesDir,
     ...(target.display !== undefined ? { DISPLAY: target.display } : {}),
@@ -49,8 +56,25 @@ export function workspaceEnvironment(target: WorkspaceTarget, extra: Record<stri
     ...(target.appDataDir !== undefined
       ? { XDG_CONFIG_HOME: `${target.appDataDir}/config`, XDG_DATA_HOME: `${target.appDataDir}/data`, XDG_STATE_HOME: `${target.appDataDir}/state` }
       : {}),
+    // programs started for the workspace publish their widgets on the display's bus (GTK through its accessibility bridge)
+    ...(target.accessibilityBus !== undefined ? { DBUS_SESSION_BUS_ADDRESS: target.accessibilityBus, GTK_MODULES: "gail:atk-bridge", NO_AT_BRIDGE: "0" } : {}),
     ...extra,
   };
+}
+
+function checkCommand(command: readonly string[]): void {
+  if (command.length === 0 || command.some((part) => typeof part !== "string" || part.includes("\0")) || command[0] === "") {
+    throw new OgbError("invalid_input", "command must be a program followed by its arguments, as text");
+  }
+}
+
+/** Starts `command` in the workspace's files directory with `workspaceEnvironment`, and leaves it running (WorkspaceHandle.spawn). */
+export function spawnInWorkspace(target: WorkspaceTarget, command: readonly string[], options: { env?: Record<string, string> } = {}): WorkspaceProcess {
+  checkCommand(command);
+  const env = workspaceEnvironment(target, options.env);
+  if (!existsSync(target.filesDir)) throw new OgbError("unavailable", "the workspace's files directory does not exist");
+  const [program, ...args] = command as [string, ...string[]];
+  return spawn(program, args, { cwd: target.filesDir, env, shell: false, stdio: ["pipe", "pipe", "pipe"] });
 }
 
 /** Runs `command` (program and arguments, no shell) in the workspace's files directory with `workspaceEnvironment`. */

@@ -11,9 +11,9 @@ export const DEFAULT_MODEL_NAME = "main";
 /** Most tokens the default model may write in one reply. One constant, to be settled by the lead's check of the real model (D8). */
 export const DEFAULT_MAX_TOKENS = 8192;
 /** Declared to the model in every session of the built-in profiles: it must be able to ask, to speak and to use the browser without searching first (D5). */
-export const ALWAYS_DECLARED_TOOLS = ["ask_human", "send_to_user", "browser", "desktop", "schedule", "remember_person"] as const;
+export const ALWAYS_DECLARED_TOOLS = ["ask_human", "send_to_user", "browser", "computer", "schedule", "remember_person"] as const;
 /** First-party plugins, in the order the profiles list them. Installed from `<appRoot>/plugins/<name>`. */
-export const FIRST_PARTY_PLUGINS = ["handoff", "browser", "computer", "mail-sim"] as const;
+export const FIRST_PARTY_PLUGINS = ["handoff", "browser", "computer", "mail-sim", "mail-temp", "mail-outlook", "mail-gmail"] as const;
 
 function readJson(path: string): unknown | undefined {
   if (!existsSync(path)) return undefined;
@@ -63,8 +63,16 @@ export function loadProfileConfig(env: AppEnvironment): ProfileConfig {
       safetyFloor: { review: true, redaction: true },
       profiles: {
         general: {
-          description: "Everyday work: files, the browser, the desktop, sharing results with other agents.",
-          plugins: ["handoff", "browser", "computer"],
+          description: "Everyday work: files, the browser, the desktop, sharing results with other agents; its own mail address when a deployment is set.",
+          // A bot's own address only when a mail deployment is configured: without it the plugin is not there at all (docs/25).
+          plugins: [
+            "handoff",
+            "browser",
+            "computer",
+            ...(env.mail.tempMail ? ["mail-temp"] : []),
+            ...(env.mail.outlook ? ["mail-outlook"] : []),
+            ...(env.mail.gmail ? ["mail-gmail"] : []),
+          ],
           model: DEFAULT_MODEL_NAME,
           alwaysDeclaredTools: [...ALWAYS_DECLARED_TOOLS],
         },
@@ -127,4 +135,86 @@ export function loadMcpConfig(env: AppEnvironment): SessionRuntimeDeps["mcp"] | 
   if (raw.expose !== undefined && raw.expose !== "direct" && raw.expose !== "codemode")
     throw new OgbError("invalid_input", `${file}: 'expose' must be "direct" or "codemode" ("search" would clash with the box's own tool search)`);
   return { servers, ...(raw.expose ? { expose: raw.expose as "direct" | "codemode" } : {}) };
+}
+
+/** One chat bridge of `<dataDir>/config/chat.json` (docs/26 4.3). The bridge server runs apart; this only says how to reach it. */
+export interface ChatBridgeConfig {
+  name: string;
+  kind: "matrix" | "satori";
+  url: string;
+  /** A secret reference (`env:NAME`, the name listed in OGB_SECRET_ENV), never the token itself. */
+  token?: string;
+  /** The person's own ids on the bridge. */
+  person: string[];
+  /** The room where bots write to the person. */
+  personRoom: string;
+  /** Rooms whose other people a bot watches: room → bot id. */
+  watch?: Record<string, string>;
+  /** Satori only: the account to act as, when the server has several. */
+  platform?: string;
+  selfId?: string;
+}
+
+/** `<dataDir>/config/chat.json`: `{ "bridges": [...] }`. No file, no bridges. Every mistake is reported at start, by field. */
+export function loadChatConfig(env: AppEnvironment): ChatBridgeConfig[] {
+  const file = join(env.dataDir, "config", "chat.json");
+  const raw = readJson(file) as { bridges?: unknown } | undefined;
+  if (raw === undefined) return [];
+  if (!Array.isArray(raw.bridges)) throw new OgbError("invalid_input", `${file}: 'bridges' must be a list`);
+  const names = new Set<string>();
+  return raw.bridges.map((value, index) => {
+    const b = value as Record<string, unknown>;
+    const where = `${file}: bridge ${index + 1}`;
+    const text = (key: string, required = true) => {
+      const v = b[key];
+      if (v === undefined && !required) return undefined;
+      if (typeof v !== "string" || v.trim() === "") throw new OgbError("invalid_input", `${where}: '${key}' must be text`);
+      return v.trim();
+    };
+    const name = text("name") as string;
+    if (!/^[a-z][a-z0-9-]{0,31}$/.test(name) || names.has(name)) throw new OgbError("invalid_input", `${where}: 'name' must be short lower-case and unique`);
+    names.add(name);
+    const kind = text("kind");
+    if (kind !== "matrix" && kind !== "satori") throw new OgbError("invalid_input", `${where}: 'kind' must be matrix or satori`);
+    const url = text("url") as string;
+    if (!/^https?:\/\/[^\s/]+/.test(url)) throw new OgbError("invalid_input", `${where}: 'url' must be an http(s) address`);
+    const token = text("token", false);
+    if (token !== undefined && !/^[a-z][a-z0-9-]*:.+$/.test(token))
+      throw new OgbError("invalid_input", `${where}: 'token' must be a secret reference such as env:OGB_MATRIX_TOKEN`);
+    if (!Array.isArray(b.person) || b.person.length === 0 || !b.person.every((p) => typeof p === "string" && p !== ""))
+      throw new OgbError("invalid_input", `${where}: 'person' must list the person's ids`);
+    const watch = b.watch;
+    if (watch !== undefined && (watch === null || typeof watch !== "object" || !Object.values(watch).every((v) => typeof v === "string")))
+      throw new OgbError("invalid_input", `${where}: 'watch' must map rooms to bot ids`);
+    const platform = text("platform", false);
+    const selfId = text("selfId", false);
+    return {
+      name,
+      kind,
+      url,
+      ...(token ? { token } : {}),
+      person: b.person as string[],
+      personRoom: text("personRoom") as string,
+      ...(watch ? { watch: watch as Record<string, string> } : {}),
+      ...(platform ? { platform } : {}),
+      ...(selfId ? { selfId } : {}),
+    };
+  });
+}
+
+/**
+ * `<dataDir>/config/review-policy.json`: the review's four lists (environment, allow, soft_deny, hard_deny), replacing Vesper's own
+ * (`VESPER_REVIEW_POLICY`); a list with "$defaults" keeps the framework's built-in entries. No file: Vesper's policy.
+ */
+export function loadReviewPolicy(env: AppEnvironment): Record<string, string[]> | undefined {
+  const file = join(env.dataDir, "config", "review-policy.json");
+  const raw = readJson(file) as Record<string, unknown> | undefined;
+  if (raw === undefined) return undefined;
+  const keys = ["environment", "allow", "soft_deny", "hard_deny"];
+  for (const [key, value] of Object.entries(raw)) {
+    if (!keys.includes(key)) throw new OgbError("invalid_input", `${file}: '${key}' is not one of ${keys.join(", ")}`);
+    if (!Array.isArray(value) || !value.every((v) => typeof v === "string" && v.trim() !== ""))
+      throw new OgbError("invalid_input", `${file}: '${key}' must be a list of sentences`);
+  }
+  return raw as Record<string, string[]>;
 }

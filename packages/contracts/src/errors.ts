@@ -26,5 +26,7 @@ export class OgbError extends Error {
 }
 
 export function isOgbError(value: unknown, kind?: ErrorKind): value is OgbError {
-  return value instanceof OgbError && (kind === undefined || value.kind === kind);
+  // `instanceof` is not enough: a bundled plugin carries its own copy of this class, so the name tag is the identity that survives bundling.
+  const ours = value instanceof OgbError || (typeof value === "object" && value !== null && (value as { name?: unknown }).name === "OgbError");
+  return ours && (kind === undefined || (value as OgbError).kind === kind);
 }

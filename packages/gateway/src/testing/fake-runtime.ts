@@ -93,7 +93,12 @@ export function createFakeRuntime(): FakeRuntime {
     async updateSession(id, patch) {
       enter(`updateSession:${id}:${JSON.stringify(patch)}`, "updateSession");
       const current = need(id);
-      const next = { ...current, ...(patch.title !== undefined ? { title: patch.title } : {}), ...(patch.star !== undefined ? { star: patch.star } : {}) };
+      const next = {
+        ...current,
+        ...(patch.title !== undefined ? { title: patch.title } : {}),
+        ...(patch.star !== undefined ? { star: patch.star } : {}),
+        ...(patch.yolo !== undefined ? { yolo: patch.yolo } : {}),
+      };
       sessions.set(id, next);
       return next;
     },
@@ -170,6 +175,12 @@ export function createFakeRuntime(): FakeRuntime {
       const open = takeovers.get(id);
       return open ? { ...open } : null;
     },
+    /** Accepts the token `good` for any hook of a known bot; records the delivery. */
+    async receiveHook(id, name, token, body, deliveryId) {
+      enter(`receiveHook:${id}:${name}:${deliveryId ?? "-"}:${body}`, "receiveHook");
+      return token === "good" && sessions.has(id);
+    },
+
     async decideApproval(id, approvalId, approved) {
       enter(`decideApproval:${id}:${approvalId}:${approved}`, "decideApproval");
       need(id);

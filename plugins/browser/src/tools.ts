@@ -1,52 +1,28 @@
 import type { PluginContext } from "@vesper/contracts";
 import type { Tool } from "sakura-agent";
-import type { BrowserBackend } from "./backend.ts";
-import { createFakeBrowser } from "./fake-backend.ts";
-import { createWorkerBackend } from "./worker-backend.ts";
-import { createBrowserTool } from "./tool.ts";
+import { createBrowserTool } from "sakura-agent-tools/browser";
 
-const NOT_BUILT = "No browser backend for this workspace address (expected a loopback http://127.0.0.1:<port> DevTools address).";
-
-function unavailable(): BrowserBackend {
-  const fail = async (): Promise<never> => {
-    throw new Error(NOT_BUILT);
-  };
-  return {
-    open: fail,
-    navigate: fail,
-    snapshot: fail,
-    click: fail,
-    type: fail,
-    press: fail,
-    readText: fail,
-    scroll: fail,
-    screenshot: fail,
-    evaluate: fail,
-    fill: fail,
-    check: fail,
-    close: fail,
-  };
-}
+/** agent-tools lives at <app root>/vendor/agent-tools (scripts/sync-agent-tools.sh); the image's app root is /opt/ogb. */
+const TOOLS = `${process.env.OGB_APP_ROOT || "/opt/ogb"}/vendor/agent-tools`;
 
 /**
- * Entry of the plugin (bundled to dist/tools.js). A workspace whose DevTools address starts with `fake:` gets the in-memory
- * demo browser; a loopback `http://127.0.0.1:<port>` address gets the owner's worker as backend (worker-backend.ts); anything
- * else gets a tool that says so.
+ * Entry of the plugin (bundled to dist/tools.js). The `browser` tool of agent-tools on the workspace's own browser: the agent writes Playwright code,
+ * its runner runs as a program of the workspace (its environment, no keys) and attaches to the browser over DevTools.
  */
 export function createTools(ctx: PluginContext): Tool[] {
   const cdpUrl = ctx.workspace.cdpUrl;
   if (cdpUrl === undefined) return [];
-  const backend = cdpUrl.startsWith("fake:")
-    ? createFakeBrowser({
-        "https://example.test/": {
-          title: "Example",
-          text: "Welcome to the example site.",
-          elements: [{ ref: "e1", role: "link", name: "Prices", goto: "https://example.test/prices" }],
-        },
-        "https://example.test/prices": { title: "Prices", text: "Widget: 10 euros", elements: [] },
-      })
-    : /^http:\/\/127\.0\.0\.1:\d+\/?$/.test(cdpUrl)
-      ? createWorkerBackend({ run: ctx.workspace.run, agentId: ctx.workspace.workspaceId, cdpUrl: cdpUrl.endsWith("/") ? cdpUrl : `${cdpUrl}/` })
-      : unavailable();
-  return [createBrowserTool({ backend })];
+  return [
+    createBrowserTool({
+      cdpUrl,
+      shots: `${ctx.workspace.filesDir}/.screens`,
+      runner: { program: process.execPath, args: [`${TOOLS}/dist/browser/runner.js`] },
+      // the workspace gives the environment; the tool adds only its own names
+      spawn: (program, args, env) => ctx.workspace.spawn([program, ...args], { env: only(env, "BROWSER_USE_") }),
+    }),
+  ];
+}
+
+function only(env: Record<string, string>, prefix: string): Record<string, string> {
+  return Object.fromEntries(Object.entries(env).filter(([name]) => name.startsWith(prefix)));
 }

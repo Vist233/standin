@@ -102,6 +102,7 @@ export class Workspace {
       filesDir: this.paths.filesDir,
       profileDir: this.paths.profileDir,
       appDataDir: join(this.config.dataDir, "shared", "app-data"),
+      ...(this.display.busAddress ? { accessibilityBus: this.display.busAddress } : {}),
     };
   }
 
@@ -165,6 +166,8 @@ export class Workspace {
 
   /** The output of the last failed or running processes, for an error message: names no environment. */
   diagnostics(): string {
-    return [this.display.xvfb, this.display.openbox, this.browser].map((p) => `${p.name}: ${p.lastOutput().trim().slice(-200)}`).join("\n");
+    return [this.display.xvfb, this.display.openbox, ...(this.display.bus ? [this.display.bus] : []), this.browser]
+      .map((p) => `${p.name}: ${p.lastOutput().trim().slice(-200)}`)
+      .join("\n");
   }
 }

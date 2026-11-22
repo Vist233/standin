@@ -66,6 +66,9 @@ export function createFakeContext(overrides: Partial<PluginContext> = {}): Plugi
       workspaceId: "ws-test",
       filesDir: "/tmp/ws-test/files",
       run: async () => ({ exitCode: 0, stdout: "", stderr: "", timedOut: false, truncated: false }),
+      spawn: () => {
+        throw new Error("the fake context starts no programs");
+      },
     },
     secrets: { resolve: async (reference) => Promise.reject(new Error(`no secret ${reference} in the fake context`)) },
     signals: { emit: () => {} },

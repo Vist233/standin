@@ -72,6 +72,18 @@ describe("model configuration", () => {
 });
 
 describe("profile configuration", () => {
+  it("the everyday profile gets real mail only when it is set up: the bot's own address with a deployment, the person's Outlook with an app id", () => {
+    expect(loadProfileConfig(envFor().env).profiles.general?.plugins).toEqual(["handoff", "browser", "computer"]);
+    const both = envFor({
+      OGB_TEMP_MAIL_URL: "https://mail-api.example.test",
+      OGB_TEMP_MAIL_DOMAIN: "mail.test",
+      OGB_OUTLOOK_CLIENT_ID: "client-1",
+      OGB_GMAIL_ADDRESS: "me@gmail.test",
+    });
+    expect(loadProfileConfig(both.env).profiles.general?.plugins).toEqual(["handoff", "browser", "computer", "mail-temp", "mail-outlook", "mail-gmail"]);
+    expect(both.env.extraSecretVariables).toEqual(["OGB_TEMP_MAIL_ADMIN", "OGB_TEMP_MAIL_SITE_PASSWORD", "OGB_GMAIL_APP_PASSWORD"]);
+  });
+
   it("defaults to two profiles with the safety floor on, naming only first-party plugins and the default model", () => {
     const { env } = envFor();
     const config = loadProfileConfig(env);
@@ -82,7 +94,7 @@ describe("profile configuration", () => {
       for (const plugin of profile.plugins) expect(FIRST_PARTY_PLUGINS).toContain(plugin);
     }
     expect(config.profiles["general-mail"]?.plugins).toContain("mail-sim");
-    for (const name of ALWAYS_DECLARED_TOOLS.filter((n) => n !== "browser" && n !== "desktop")) expect(Object.values(CORE_TOOL_NAMES).flat()).toContain(name); // no typo in a core name
+    for (const name of ALWAYS_DECLARED_TOOLS.filter((n) => n !== "browser" && n !== "computer")) expect(Object.values(CORE_TOOL_NAMES).flat()).toContain(name); // no typo in a core name
     for (const profile of Object.values(config.profiles)) expect(profile.alwaysDeclaredTools).toEqual([...ALWAYS_DECLARED_TOOLS]); // ask, speak and browse need no search first
     expect(config.profiles.general?.plugins).not.toContain("mail-sim");
   });

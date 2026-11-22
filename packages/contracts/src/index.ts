@@ -26,6 +26,7 @@ export {
   type ToolRef,
   type ToolResultPayload,
 } from "./events.ts";
+export type { Channel, ChannelInbox, Outgoing } from "./channels.ts";
 export { isJsonObject, type JsonValue } from "./json.ts";
 export type { Decision, DecisionOutcome, Delivery, Signal, SignalDraft, SignalPriority, SignalSource, Trust } from "./signals.ts";
 export type {
@@ -36,6 +37,7 @@ export type {
   SecretResolver,
   SignalSink,
   WorkspaceHandle,
+  WorkspaceProcess,
 } from "./plugin-context.ts";
 export type { StartupLine } from "./startup.ts";
 export { CORE_TOOL_NAMES } from "./tool-names.ts";

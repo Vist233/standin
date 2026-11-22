@@ -28,6 +28,16 @@ describe("ApprovalBook", () => {
   });
 });
 
+describe("ApprovalBook: the same call whatever the order of its arguments", () => {
+  it("an approved call repeated with its keys in another order runs; different content does not", () => {
+    const book = new ApprovalBook();
+    const { request } = book.request("mail_send", { to: ["li.wei@partner.test"], subject: "notes", body: "hi", meta: { a: 1, b: 2 } });
+    book.decide(request.id, true);
+    expect(book.consume("mail_send", { body: "hi", subject: "notes", meta: { b: 2, a: 1 }, to: ["li.wei@partner.test"] })).toBe(true);
+    expect(ApprovalBook.keyOf("mail_send", { to: ["a@x.test", "b@x.test"] })).not.toBe(ApprovalBook.keyOf("mail_send", { to: ["b@x.test", "a@x.test"] }));
+  });
+});
+
 describe("how a run's end is told to the page", () => {
   it("maps the framework's reasons to the page's words", () => {
     expect([runReasonOf("done"), runReasonOf("paused"), runReasonOf("cancelled"), runReasonOf("error")]).toEqual(["end", "pause", "cancelled", "error"]);

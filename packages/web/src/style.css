@@ -337,6 +337,21 @@ button[disabled] {
 .empty #empty-new[hidden] {
   display: none;
 }
+/* Yolo: the bot's approvals and review are off. Quiet while off; loud while on, so nobody forgets it. */
+.yolo {
+  padding: 3px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--ink-3);
+  font-size: 12px;
+}
+.yolo[aria-pressed="true"] {
+  border-color: var(--error);
+  background: var(--error-soft);
+  color: var(--error);
+  font-weight: 600;
+}
 .deskchip {
   display: inline-flex;
   align-items: center;
@@ -1083,8 +1098,7 @@ button.link {
   display: grid;
   grid-template-columns: var(--rail-w, 260px) minmax(0, 1fr) 0 var(--desk-w, 0px);
 }
-.body[data-placement="stack"][data-desk="docked"],
-.body[data-placement="stack"][data-desk="stage"] {
+.body[data-placement="stack"] {
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: min(42vh, 62.5vw) minmax(0, 1fr);
 }

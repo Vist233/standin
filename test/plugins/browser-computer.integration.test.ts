@@ -1,27 +1,36 @@
-// The browser and computer plugins installed from a marketplace, loaded by the plugin host and used by a session of the runtime
-// with the framework's real agent loop, real sub-agents and the real review plugin. Backends are the in-memory fakes.
+// The browser and computer plugins installed from a marketplace, loaded by the plugin host and used by a session of the runtime with the
+// framework's real agent loop, sub-agents and review. The tools are real: their runners start through the workspace's `spawn` (the computer's
+// Python runner needs no display for these steps; the browser drives a real headless Chrome and is skipped without one). Only the model is scripted.
+import { execFileSync } from "node:child_process";
 import { mkdtempSync, rmSync } from "node:fs";
+import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { installFromMarketplace, makeWritable, parseMarketplace } from "@vesper/plugin-host";
-import { createRig } from "@vesper/session-runtime/testing";
+import { createRig, lastMessage } from "@vesper/session-runtime/testing";
 import { reviewPlugin } from "sakura-agent";
+import { findChrome, launchChrome } from "sakura-agent-tools/browser";
 import { createFauxClient } from "sakura-agent/testing";
-import { afterEach, describe, expect, it } from "vitest";
-import { SITE } from "../../plugins/browser/test/contract.ts";
-import { createFakeKit } from "../../plugins/computer/test/fake-kit.ts";
-import { createFakeWorker } from "../../plugins/browser/test/fake-worker.ts";
+import { afterEach, beforeAll, describe, expect, it } from "vitest";
 
 const repoRoot = resolve(import.meta.dirname, "..", "..");
 const cleanups: (() => void | Promise<void>)[] = [];
 afterEach(async () => {
   for (const cleanup of cleanups.splice(0).reverse()) await cleanup();
 });
+beforeAll(() => {
+  process.env.OGB_APP_ROOT = repoRoot; // the plugins find the runners at <app root>/vendor/agent-tools, as in the image
+});
 
 type Request = { tools: { name: string }[]; messages: { role: string; content: { type: string; text?: string }[] }[] };
 const toolNames = (request: Request) => request.tools.map((t) => t.name);
 const toolResultTexts = (request: Request) => request.messages.filter((m) => m.role === "tool").map((m) => JSON.stringify(m.content));
 const ALLOW = '{"risk_level":"low","user_authorization":"high","outcome":"allow","rationale":"ok"}';
+const runners = () =>
+  execFileSync("ps", ["-eo", "args"])
+    .toString()
+    .split("\n")
+    .filter((line) => line.includes("vendor/agent-tools") && line.includes("runner"));
 
 function install(...names: string[]) {
   const cache = mkdtempSync(join(tmpdir(), "ogb-plugin-cache-"));
@@ -35,155 +44,102 @@ function install(...names: string[]) {
   return result.installed;
 }
 
-const call = (name: string, args: unknown) => ({ toolCalls: [{ name: "tool_call", args: { name, args } }] });
-
-describe("browser plugin with a real sub-agent", () => {
-  it("a helper started with delegate shares the browser but cannot use the parent's tab", async () => {
-    const rig = createRig({
-      plugins: install("browser"),
-      profiles: { default: "p", profiles: { p: { plugins: ["browser"] } } },
-      workspace: { cdpUrl: "fake:browser" },
-      script: (request) => {
-        const results = toolResultTexts(request as never);
-        if (toolNames(request as never).includes("delegate")) {
-          if (results.length === 0) return call("browser", { action: "open", url: "https://example.test/" });
-          if (results.length === 1) return { toolCalls: [{ name: "delegate", args: { message: "Read the page in tab t1 of the browser." } }] };
-          return { text: "all done" };
-        }
-        if (results.length === 0) return call("browser", { action: "snapshot", tab: "t1" });
-        if (results.length === 1) return call("browser", { action: "open", url: "https://example.test/prices" });
-        return { text: "I opened my own tab instead" };
-      },
-    });
-    cleanups.push(() => rig.cleanup());
-    const { id } = await rig.runtime.createSession();
-    await rig.runtime.send(id, "look at the example site");
-    await rig.runtime.whenIdle(id);
-
-    const childRequests = rig.faux.requests.filter((r) => !r.tools.some((t) => t.name === "delegate"));
-    expect(childRequests.length).toBeGreaterThanOrEqual(2);
-    expect(toolResultTexts(childRequests[1] as never)[0]).toContain("belongs to another agent");
-    expect(toolResultTexts(childRequests.at(-1) as never).join("")).toContain('\\"tab\\":\\"t2\\"'); // the helper's own tab is a different one
-    const finished = (await rig.runtime.read(id)).filter((e) => e.type === "run.finished").map((e) => (e.payload as { reason: string }).reason);
-    expect(finished).toEqual(["end"]);
-  });
-
-  it("with a loopback DevTools address the plugin drives the owner's worker through the workspace's own run()", async () => {
-    const worker = createFakeWorker(SITE);
-    const rig = createRig({
-      plugins: install("browser"),
-      profiles: { default: "p", profiles: { p: { plugins: ["browser"] } } },
-      workspace: { cdpUrl: "http://127.0.0.1:9301" },
-      script: (request) => {
-        const results = toolResultTexts(request as never);
-        if (results.length === 0) return call("browser", { action: "open", url: "https://site.test/" });
-        if (results.length === 1) return call("browser", { action: "click", ref: "e1", expectText: "10 euros" });
-        return { text: "found the price" };
-      },
-    });
-    rig.workspaces.onRun.handler = (c) => worker.run(c.command, c.options);
-    cleanups.push(() => rig.cleanup());
-    const { id } = await rig.runtime.createSession();
-    await rig.runtime.send(id, "what does the widget cost?");
-    await rig.runtime.whenIdle(id);
-    const results = (await rig.runtime.read(id)).filter((e) => e.type === "tool.result").map((e) => JSON.stringify(e.payload));
-    expect(results[0]).toContain("Home");
-    expect(results[1]).toContain('verified\\":true');
-    expect(rig.workspaces.runs.length).toBeGreaterThan(2);
-    for (const run of rig.workspaces.runs) {
-      expect(run.command.slice(0, 2)).toEqual(["sakura-browser-worker", "call"]);
-      expect(Object.keys(run.options?.env ?? {}).sort()).toEqual(["BROWSER_TOOL_AGENT_ID", "BROWSER_TOOL_CDP"]);
-    }
-  });
-
-  it("is not offered without a browser in the workspace", async () => {
-    const rig = createRig({
-      plugins: install("browser"),
-      profiles: { default: "p", profiles: { p: { plugins: ["browser"] } } },
-      script: (request) =>
-        toolResultTexts(request as never).length === 0 ? { toolCalls: [{ name: "tool_search", args: { query: "browser" } }] } : { text: "none" },
-    });
-    cleanups.push(() => rig.cleanup());
-    const { id } = await rig.runtime.createSession();
-    await rig.runtime.send(id, "find a browser tool");
-    await rig.runtime.whenIdle(id);
-    const events = await rig.runtime.read(id);
-    const found = JSON.stringify(events.find((e) => e.type === "tool.result")?.payload);
-    expect(found).not.toContain("browser:"); // workspace_info mentions a browser, but there is no `browser` tool to find
-  });
-});
-
-describe("computer plugin: the agent uses the desktop itself, and a sub-agent can too", () => {
-  it("the agent reads the tree, clicks and takes a screenshot with its own desktop tool; every action is reviewed", async () => {
+describe("computer plugin", () => {
+  it("runs the agent's Python through the workspace, every call reviewed; a sub-agent has the tool and its own names; the runners end with the session", async () => {
     const reviewed: string[] = [];
     const reviewer = createFauxClient((request) => {
-      const last = JSON.stringify(request.messages.at(-1));
-      reviewed.push(/tool: (\w+)/.exec(last)?.[1] ?? "?");
+      reviewed.push(/tool: (\w+)/.exec(JSON.stringify(lastMessage(request as never)))?.[1] ?? "?");
       return { text: ALLOW };
     });
     const rig = createRig({
       plugins: install("computer"),
-      profiles: { default: "p", profiles: { p: { plugins: ["computer"], alwaysDeclaredTools: ["desktop"] } } },
-      workspace: { display: "fake:desktop" },
+      profiles: { default: "p", profiles: { p: { plugins: ["computer"], alwaysDeclaredTools: ["computer"] } } },
+      workspace: { display: ":99" },
       runtime: { safetyPlugins: () => [reviewPlugin({ llm: reviewer })] },
-      script: (request) =>
-        [
-          { toolCalls: [{ name: "desktop", args: { action: "tree" } }] },
-          { toolCalls: [{ name: "desktop", args: { action: "click", ref: "w1" } }] },
-          { toolCalls: [{ name: "desktop", args: { action: "screenshot" } }] },
-          { text: "Pressed Save; the dialog closed." },
-        ][toolResultTexts(request as never).length] ?? { text: "done" },
-    });
-    cleanups.push(() => rig.cleanup());
-    const { id } = await rig.runtime.createSession();
-    await rig.runtime.send(id, "save the document");
-    await rig.runtime.whenIdle(id);
-    expect(toolNames(rig.faux.requests[0] as never)).toContain("desktop"); // declared to the agent itself
-    expect(JSON.stringify(rig.faux.requests.at(-1)?.messages)).toContain("w1 button"); // it saw the tree
-    expect(reviewed.filter((name) => name === "desktop")).toHaveLength(3);
-  });
-
-  it("a large desktop job goes to a sub-agent with delegate, which has the desktop tool too", async () => {
-    const rig = createRig({
-      plugins: install("computer"),
-      profiles: { default: "p", profiles: { p: { plugins: ["computer"], alwaysDeclaredTools: ["desktop"] } } },
-      workspace: { display: "fake:desktop" },
       script: (request) => {
         const results = toolResultTexts(request as never);
-        const isParent = request.tools.some((t) => t.name === "delegate");
-        if (!isParent)
-          return results.length === 0 ? { toolCalls: [{ name: "desktop", args: { action: "click", ref: "w1" } }] } : { text: "Clicked Save in the dialog." };
-        return results.length === 0 ? { toolCalls: [{ name: "delegate", args: { message: "Click Save in the open dialog and report." } }] } : { text: "saved" };
+        if (!request.tools.some((t) => t.name === "delegate"))
+          return results.length === 0 ? { toolCalls: [{ name: "computer", args: { code: "'mine' in globals()" } }] } : { text: "helper done" };
+        return (
+          [
+            {
+              toolCalls: [
+                { name: "computer", args: { code: "import os\nmine = 1\n(os.getcwd(), os.environ.get('DISPLAY'), 'COMMANDCODE_API_KEY' in os.environ)" } },
+              ],
+            },
+            { toolCalls: [{ name: "delegate", args: { message: "Check the desktop session." } }] },
+          ][results.length] ?? { text: "done" }
+        );
       },
     });
     cleanups.push(() => rig.cleanup());
     const { id } = await rig.runtime.createSession();
-    await rig.runtime.send(id, "save the document");
+    await rig.runtime.send(id, "look at the desktop");
     await rig.runtime.whenIdle(id);
+
+    expect(toolNames(rig.faux.requests[0] as never)).toContain("computer");
+    const results = (await rig.runtime.read(id)).filter((e) => e.type === "tool.result").map((e) => JSON.stringify(e.payload));
+    expect(results[0]).toMatch(/files\\",\s*\\":99\\",\s*false/); // in the files directory, on the workspace's display, no key
     const child = rig.faux.requests.find((r) => !r.tools.some((t) => t.name === "delegate"));
-    expect(child?.tools.map((t) => t.name)).toContain("desktop"); // the sub-agent inherited the desktop tool
-    expect(JSON.stringify(rig.faux.requests.at(-1)?.messages)).toContain("Clicked Save"); // its report came back
+    expect(child?.tools.map((t) => t.name)).toContain("computer");
+    expect(JSON.stringify(rig.faux.requests.filter((r) => !r.tools.some((t) => t.name === "delegate")).at(-1)?.messages)).toContain("false"); // its own names
+    expect(reviewed.filter((name) => name === "computer").length).toBeGreaterThanOrEqual(2);
+    expect(runners().length).toBeGreaterThan(0);
+    await rig.runtime.closeSession(id);
+    expect(runners()).toEqual([]);
   });
 
-  it("with a real display name the desktop tool drives the owner's gui kit through the workspace's run()", async () => {
-    const kit = createFakeKit();
+  it("is not offered without a display", async () => {
     const rig = createRig({
       plugins: install("computer"),
-      profiles: { default: "p", profiles: { p: { plugins: ["computer"], alwaysDeclaredTools: ["desktop"] } } },
-      workspace: { display: ":101" },
-      script: (request) =>
-        [
-          { toolCalls: [{ name: "desktop", args: { action: "tree" } }] },
-          { toolCalls: [{ name: "desktop", args: { action: "click", ref: "w1" } }] },
-          { text: "Clicked Save." },
-        ][toolResultTexts(request as never).length] ?? { text: "done" },
+      profiles: { default: "p", profiles: { p: { plugins: ["computer"] } } },
+      script: () => ({ text: "none" }),
     });
-    rig.workspaces.onRun.handler = (c) => kit.run(c.command, c.options);
     cleanups.push(() => rig.cleanup());
     const { id } = await rig.runtime.createSession();
-    await rig.runtime.send(id, "click save");
+    await rig.runtime.send(id, "anything");
     await rig.runtime.whenIdle(id);
-    expect(kit.actions).toEqual(["click w1"]);
-    expect(kit.commands.map((c) => c.command[1]?.split("/").pop())).toEqual(["observe.py", "act.py"]);
+    expect(JSON.stringify(rig.faux.requests[0]?.tools)).not.toContain('"computer"');
+  });
+});
+
+describe("browser plugin", { skip: !findChrome() }, () => {
+  it("runs Playwright code against the workspace's browser; a sub-agent works in a tab of its own", async () => {
+    const chrome = await launchChrome();
+    const server = createServer((_request, response) => {
+      response.setHeader("content-type", "text/html");
+      response.end("<title>Prices</title><p id=p>10 euros</p>");
+    });
+    await new Promise<void>((done) => server.listen(0, "127.0.0.1", done));
+    const site = `http://127.0.0.1:${(server.address() as { port: number }).port}/`;
+    cleanups.push(async () => {
+      server.close();
+      await chrome.close();
+    });
+    const call = (code: string) => ({ toolCalls: [{ name: "tool_call", args: { name: "browser", args: { code } } }] });
+    const rig = createRig({
+      plugins: install("browser"),
+      profiles: { default: "p", profiles: { p: { plugins: ["browser"] } } },
+      workspace: { cdpUrl: chrome.cdpUrl },
+      script: (request) => {
+        const results = toolResultTexts(request as never);
+        if (!request.tools.some((t) => t.name === "delegate")) return results.length === 0 ? call("return page.url()") : { text: "helper done" };
+        return (
+          [
+            call(`await page.goto(${JSON.stringify(site)}); return await page.locator('#p').innerText()`),
+            { toolCalls: [{ name: "delegate", args: { message: "Where is your tab?" } }] },
+          ][results.length] ?? { text: "done" }
+        );
+      },
+    });
+    cleanups.push(() => rig.cleanup());
+    const { id } = await rig.runtime.createSession();
+    await rig.runtime.send(id, "what does it cost?");
+    await rig.runtime.whenIdle(id);
+    const results = (await rig.runtime.read(id)).filter((e) => e.type === "tool.result").map((e) => JSON.stringify(e.payload));
+    expect(results[0]).toContain("10 euros");
+    expect(results[0]).toContain("Prices");
+    const childResults = rig.faux.requests.filter((r) => !r.tools.some((t) => t.name === "delegate")).flatMap((r) => toolResultTexts(r as never));
+    expect(childResults.join("")).toContain("about:blank"); // the helper's own tab, not the parent's page
   });
 });

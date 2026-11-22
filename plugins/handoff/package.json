@@ -6,7 +6,6 @@
   "description": "The handoff tool as a plugin: agents hand each other checked work packages through one shared store.",
   "license": "MIT",
   "dependencies": {
-    "@vesper/contracts": "*",
-    "step-by-step-handoff-mcp": "0.3.0"
+    "@vesper/contracts": "*"
   }
 }

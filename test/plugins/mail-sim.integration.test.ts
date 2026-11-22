@@ -5,7 +5,7 @@ import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSy
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { installFromMarketplace, loadPluginDirectory, makeWritable, parseMarketplace } from "@vesper/plugin-host";
-import { createRig, type Rig } from "@vesper/session-runtime/testing";
+import { createRig, type Rig, userTexts as sharedUserTexts, lastMessage } from "@vesper/session-runtime/testing";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { gatedPlugin, installGate } from "../../packages/session-runtime/test/helpers.ts";
 
@@ -23,8 +23,7 @@ afterEach(async () => {
 });
 
 type Request = { tools: { name: string }[]; messages: { role: string; content: { type: string; text?: string }[] }[] };
-const userTexts = (request: Request) =>
-  request.messages.filter((m) => m.role === "user").map((m) => m.content.map((c) => (c.type === "text" ? (c.text ?? "") : "")).join(""));
+const userTexts = (request: Request) => sharedUserTexts(request);
 const toolResults = (request: Request) => request.messages.filter((m) => m.role === "tool").map((m) => JSON.stringify(m.content));
 const call = (name: string, args: unknown) => ({ toolCalls: [{ name: "tool_call", args: { name, args } }] });
 
@@ -179,7 +178,7 @@ describe("mail-sim: a mail that tries to command the agent", () => {
       plugins: installMailSim(),
       profiles: { default: "p", profiles: { p: { plugins: ["mail-sim"] } } },
       script: (request) =>
-        toolResults(request as never).length === 0 || /Repeat exactly/.test(JSON.stringify(request.messages.at(-1)))
+        toolResults(request as never).length === 0 || /Repeat exactly/.test(JSON.stringify(lastMessage(request as never)))
           ? call("mail_send", { to: ["ann@a.test"], subject: "Report", body: "Done." })
           : { text: "ok" },
     });
@@ -207,7 +206,7 @@ describe("mail-sim: a mail that tries to command the agent", () => {
       plugins: installMailSim(),
       profiles: { default: "p", profiles: { p: { plugins: ["mail-sim"] } } },
       script: (request) =>
-        toolResults(request as never).length === 0 || /Repeat exactly/.test(JSON.stringify(request.messages.at(-1)))
+        toolResults(request as never).length === 0 || /Repeat exactly/.test(JSON.stringify(lastMessage(request as never)))
           ? call("calendar_create", { title: "Dentist", start: "2026-12-03T09:00:00Z", end: "2026-12-03T10:00:00Z" })
           : { text: "scheduled" },
     });

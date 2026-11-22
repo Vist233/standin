@@ -19,6 +19,9 @@ export interface DisplayCallbacks {
 export class Display {
   readonly xvfb: SupervisedProcess;
   readonly openbox: SupervisedProcess;
+  /** The display's D-Bus session for the accessibility tree, and its address; absent when the configuration has none. */
+  readonly bus?: SupervisedProcess;
+  readonly busAddress?: string;
   readonly socketPath: string;
   readonly number: number;
 
@@ -65,15 +68,38 @@ export class Display {
       pidFile: join(runDir, "openbox.pid"),
       backoff: config.backoff,
     });
+    if (config.accessibilityBus) {
+      const socket = join(runDir, "a11y-bus");
+      this.busAddress = `unix:path=${socket}`;
+      this.bus = new SupervisedProcess({
+        spec: {
+          name: `a11y-bus-${name}`,
+          command: config.accessibilityBus.command,
+          args: [...(config.accessibilityBus.args ?? []), "--session", "--nofork", "--nopidfile", `--address=${this.busAddress}`],
+          env: { DISPLAY: display, OGB_X11_DIR: config.x11Dir }, // what it starts (the AT-SPI service) registers with this display
+        },
+        log,
+        pidFile: join(runDir, "a11y-bus.pid"),
+        backoff: config.backoff,
+        probe: async () => existsSync(socket),
+        probeIntervalMs: config.probeIntervalMs,
+        beforeStart: () => rmSync(socket, { force: true }),
+      });
+    }
   }
 
   async start(timeoutMs: number): Promise<void> {
     this.xvfb.start();
     await this.xvfb.waitReady(timeoutMs);
     this.openbox.start();
+    if (this.bus) {
+      this.bus.start();
+      await this.bus.waitReady(timeoutMs);
+    }
   }
 
   async stop(): Promise<void> {
+    await this.bus?.stop();
     await this.openbox.stop();
     await this.xvfb.stop();
   }

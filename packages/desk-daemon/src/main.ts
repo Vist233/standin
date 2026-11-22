@@ -23,6 +23,7 @@ function configFromEnvironment() {
     ...(env.OGB_X11_DIR ? { x11Dir: env.OGB_X11_DIR } : {}),
     ...(env.OGB_CHROMIUM_PATH ? { chromium: { command: env.OGB_CHROMIUM_PATH } } : {}),
     viewFilter: parseViewFilter(env.OGB_DESK_VIEW_FILTER),
+    ...(env.OGB_DESK_A11Y === "off" ? {} : { accessibilityBus: { command: "dbus-daemon" } }),
     ...(env.OGB_MAX_WORKSPACES ? { maxWorkspaces: Number(env.OGB_MAX_WORKSPACES) } : {}),
   });
 }

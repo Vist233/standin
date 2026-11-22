@@ -88,6 +88,41 @@ export function providerContract(name: string, create: () => Promise<ProviderHar
       });
     });
 
+    it("a watch that starts again from its cursor reports, once each, the mail that came while it was stopped", async () => {
+      await withHarness(async (h) => {
+        const reader = h.provider.mail?.reader;
+        if (!reader) return;
+        await h.deliver({ from: "old@a.test", subject: "Before", body: "x" });
+        await h.settle();
+        let cursor: string | undefined;
+        const keep = (c: string) => {
+          cursor = c;
+        };
+        const first: string[] = [];
+        const stopFirst = reader.watch((m) => void first.push(m.subject), { onCursor: keep });
+        await h.settle();
+        await h.deliver({ from: "a@a.test", subject: "While up", body: "x" });
+        await h.settle();
+        await h.settle();
+        stopFirst();
+        expect(first).toEqual(["While up"]);
+        expect(cursor).toBeDefined();
+
+        await h.deliver({ from: "b@a.test", subject: "While down 1", body: "x" }); // the box is down
+        await h.deliver({ from: "c@a.test", subject: "While down 2", body: "x" });
+        await h.settle();
+        const second: string[] = [];
+        const stopSecond = reader.watch((m) => void second.push(m.subject), { after: cursor, onCursor: keep });
+        await h.settle();
+        await h.settle();
+        await h.deliver({ from: "d@a.test", subject: "After restart", body: "x" });
+        await h.settle();
+        await h.settle();
+        stopSecond();
+        expect(second).toEqual(["While down 1", "While down 2", "After restart"]);
+      });
+    });
+
     it("send puts a copy in the sent folder, from the account's own address", async () => {
       await withHarness(async (h) => {
         const { reader, sender } = h.provider.mail ?? {};

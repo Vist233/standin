@@ -27,6 +27,7 @@ export type GatewayRuntime = Omit<
     | "reportTakeoverViewer"
     | "closeTakeover"
     | "takeoverState"
+    | "receiveHook"
   >,
   "send"
 > & {

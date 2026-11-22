@@ -70,12 +70,12 @@ describe("check-boundaries", () => {
 
   it("lets a plugin use only the npm packages the table grants it by name, and ignores generated dist bundles", () => {
     const root = makeSandboxRoot();
-    writeIn(root, "plugins/handoff/src/tools.ts", 'import { createHandoff } from "step-by-step-handoff-mcp/core";\nexport const x = createHandoff;\n');
-    writeIn(root, "plugins/other/src/tools.ts", 'import { createHandoff } from "step-by-step-handoff-mcp/core";\nexport const x = createHandoff;\n');
+    writeIn(root, "plugins/handoff/src/tools.ts", 'import { createHandoffTool } from "sakura-agent-tools/handoff";\nexport const x = createHandoffTool;\n');
+    writeIn(root, "plugins/other/src/tools.ts", 'import { createHandoffTool } from "sakura-agent-tools/handoff";\nexport const x = createHandoffTool;\n');
     writeIn(root, "plugins/handoff/dist/tools.js", 'import "@vesper/gateway";\nimport "lodash";\n'); // a bundle is generated, not checked
     const result = runScript(root, "check-boundaries.mjs");
     expect(result.status).toBe(1);
-    expect(result.stderr).toContain("plugins/other/src/tools.ts imports 'step-by-step-handoff-mcp/core'");
+    expect(result.stderr).toContain("plugins/other/src/tools.ts imports 'sakura-agent-tools/handoff'");
     expect(result.stderr).not.toContain("plugins/handoff");
   });
 

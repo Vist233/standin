@@ -1,5 +1,6 @@
+import type { ReviewPolicy } from "./review-policy.ts";
 import type { WaitLimits } from "./waits.ts";
-import type { SecretResolver, WorkspaceHandle } from "@vesper/contracts";
+import type { Channel, SecretResolver, WorkspaceHandle } from "@vesper/contracts";
 import type { EventJournal } from "@vesper/event-journal";
 import type { ModelRegistry } from "@vesper/model-registry";
 import type { PluginHost } from "@vesper/plugin-host";
@@ -31,6 +32,8 @@ export interface WorkspaceProvider {
 export type LogSink = (entry: Record<string, unknown>) => void;
 
 export interface SessionRuntimeDeps {
+  /** Where outside services reach this box's webhooks (a relay's public address, docs/26 3.4); without it the hook tool names the local path only. */
+  hookBaseUrl?: string;
   store: SessionStore;
   models: ModelRegistry;
   profiles: ProfileConfig;
@@ -40,7 +43,9 @@ export interface SessionRuntimeDeps {
   /** One journal per session, made by the runtime from the store's paths unless a factory is given (tests). */
   journalFor?: (directory: string) => EventJournal;
   /** Builds the framework plugins for the safety floor of a session. Defaults to the framework's review and redaction plugins. */
-  safetyPlugins?: (floor: readonly SafetyPlugin[], llm: LlmClient) => Plugin[];
+  safetyPlugins?: (floor: readonly SafetyPlugin[], llm: LlmClient, policy?: ReviewPolicy) => Plugin[];
+  /** The review's policy (`review-policy.ts`); default Vesper's own, which stops only big, hard-to-undo things. */
+  reviewPolicy?: ReviewPolicy;
   /** Defaults to the framework's `createAgent`; a test can wrap it to see what the runtime passed. */
   createAgent?: (config: AgentConfig) => Promise<Agent>;
   routerOptions?: RouterOptions;
@@ -53,10 +58,10 @@ export interface SessionRuntimeDeps {
    */
   mcp?: AgentConfig["mcp"];
   /**
-   * The delivery port (docs/20 part 4.5): called with the result of a scheduled run worth telling the person. Channels (mail,
-   * chat) plug in here; the page reads the same notice from the bot's info and shows a browser notification.
+   * The person's channels besides the page (mail to their own address, a chat platform): each brings the person's messages in and gets what
+   * the person should get (contracts/channels.ts). The page is always the first channel.
    */
-  notify?: (sessionId: string, notice: { title: string; at: number; text: string }) => void;
+  channels?: Channel[];
   /** Write a one-line summary of the person's task after each run (one small model call). The app turns it on; default off. */
   summaries?: boolean;
   /** How often the scheduler looks for due jobs (default 60 s; tests shorten it). */
@@ -79,6 +84,8 @@ export interface SessionInfo {
   createdAt: number;
   /** The bot's avatar (a preset star id), when the person chose one. */
   star?: string;
+  /** True while the person has switched this bot's approvals and review off (yolo). */
+  yolo?: boolean;
   /** One line about the person's task, written after each run. */
   summary?: string;
   /** The `when` of the bot's next scheduled job, when it has one. */

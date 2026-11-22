@@ -1,0 +1,16 @@
+{
+  "name": "mail-gmail",
+  "version": "0.1.0",
+  "description": "The person's Gmail (or any IMAP and SMTP mailbox) with an app password. One bot holds it, after the person approves gmail_connect. Needs OGB_GMAIL_ADDRESS and the secret OGB_GMAIL_APP_PASSWORD.",
+  "license": "MIT",
+  "extensions": {
+    "vesper": {
+      "tools": "dist/tools.js",
+      "sources": "dist/sources.js",
+      "promptSection": "prompt.md",
+      "effects": ["read", "network", "irreversible"],
+      "approval": { "gmail_connect": "ask" },
+      "defaultEnabled": false
+    }
+  }
+}

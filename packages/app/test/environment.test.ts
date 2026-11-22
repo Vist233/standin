@@ -41,6 +41,11 @@ describe("parseEnvironment", () => {
     });
   });
 
+  it("keeps the hook relay's address, so the puller starts and hooks get the public address (testers' B-10)", () => {
+    expect(parseEnvironment({ OGB_HOOK_RELAY_URL: "https://relay.example.workers.dev" }).hookRelayUrl).toBe("https://relay.example.workers.dev");
+    expect(parseEnvironment({})).not.toHaveProperty("hookRelayUrl");
+  });
+
   it("reports every problem at once by variable name, never by value", () => {
     try {
       parseEnvironment({ OGB_PORT: "http", OGB_LISTEN_OPEN: "maybe", OGB_MODEL_BASE_URL: "ftp://x", OGB_MODEL_CONTEXT_WINDOW: "5", OGB_SECRET_ENV: "lower" });

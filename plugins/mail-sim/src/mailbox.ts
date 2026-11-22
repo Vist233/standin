@@ -98,18 +98,34 @@ export function createFileMailbox(options: MailboxOptions): Provider {
     return true;
   };
 
-  /** Calls `onNew` for items that appear after the watch started, in the order they were dated. */
-  function watchFolder<T extends { id: string; date: number }>(list: () => T[], onNew: (item: T) => void): Stop {
-    const known = new Set(list().map((item) => item.id)); // taken now, not at the first poll: nothing between is lost
-    const timer = setInterval(() => {
+  /**
+   * Calls `onNew` for items that appear after the watch started, in the order they were dated. With `after` (a cursor: the date and id
+   * of the last item reported) it first reports what came after that point.
+   */
+  function watchFolder<T extends { id: string; date: number }>(
+    list: () => T[],
+    onNew: (item: T) => void,
+    options: { after?: string | undefined; onCursor?: ((cursor: string) => void) | undefined } = {},
+  ): Stop {
+    const keyOf = (item: T) => `${String(Math.round(item.date)).padStart(16, "0")}|${item.id}`;
+    const items = list();
+    // Taken now, not at the first poll: nothing between is lost.
+    const known = new Set(items.filter((item) => options.after === undefined || keyOf(item) <= (options.after as string)).map((item) => item.id));
+    let cursor = options.after ?? items.map(keyOf).sort().at(-1) ?? "";
+    const look = () => {
       const fresh = list()
         .filter((item) => !known.has(item.id))
         .sort((a, b) => a.date - b.date || a.id.localeCompare(b.id));
       for (const item of fresh) {
         known.add(item.id);
         onNew(item);
+        if (keyOf(item) > cursor) cursor = keyOf(item);
+        options.onCursor?.(cursor);
       }
-    }, poll);
+    };
+    options.onCursor?.(cursor);
+    if (options.after !== undefined) look();
+    const timer = setInterval(look, poll);
     timer.unref();
     return () => clearInterval(timer);
   }
@@ -158,10 +174,11 @@ export function createFileMailbox(options: MailboxOptions): Provider {
           }
           throw new OgbError("not_found", `no message '${id}'`);
         },
-        watch: (onMail) =>
+        watch: (onMail, watchOptions) =>
           watchFolder(
             () => all("inbox"),
             (mail) => onMail(summary(mail)),
+            watchOptions,
           ),
       },
       sender: {

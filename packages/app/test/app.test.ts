@@ -2,6 +2,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSyn
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
+import { createFakeMatrix, createFakeTempMail } from "@vesper/connectors/testing";
 import { createApp } from "../src/app.ts";
 import { harness, type Harness, KEY, repoRoot } from "./helpers.ts";
 
@@ -9,7 +10,7 @@ const made: Harness[] = [];
 afterEach(async () => {
   for (const h of made.splice(0)) await h.cleanup();
 });
-const start = (env: Record<string, string | undefined> = {}, options: { deskDown?: boolean; backendSearchPath?: string; processEnv?: boolean } = {}) => {
+const start = (env: Record<string, string | undefined> = {}, options: { deskDown?: boolean; processEnv?: boolean; fetch?: typeof fetch } = {}) => {
   const h = harness(env, options);
   made.push(h);
   return h;
@@ -34,25 +35,21 @@ describe("starting", () => {
     const info = (text: string) => ({ level: "info", text });
     expect(report.lines).toContainEqual({ level: "warn", text: "no COMMANDCODE_API_KEY: sessions cannot call a model" });
     expect(report.lines[0]?.text).toMatch(/^page and API listening on 127\.0\.0\.1:\d+$/);
-    expect(report.lines).toContainEqual(info("plugins loaded: handoff, browser, computer, mail-sim (4 of 4)"));
+    expect(report.lines).toContainEqual(info("plugins loaded: handoff, browser, computer, mail-sim, mail-temp, mail-outlook, mail-gmail (7 of 7)"));
     expect(report.lines).toContainEqual(info("profiles: general, general-mail"));
     expect(report.lines).toContainEqual(info("desk-daemon: reachable"));
     expect(report.lines).toContainEqual(info("live view and take-over: through the desk-daemon (the desktop over VNC)"));
     expect(report.lines.map((l) => l.text).join("\n")).not.toContain("not wired");
     const warnings = report.lines.filter((l) => l.level === "warn").map((l) => l.text);
-    expect(warnings).toEqual([
-      "no COMMANDCODE_API_KEY: sessions cannot call a model",
-      "browser tool: sakura-browser-worker is not installed in this image, so the browser tool will answer with an error (agent-browser alone is not enough)",
-    ]);
-    expect(report.lines).toContainEqual(info("desktop accessibility bus: not started (the desktop tool cannot read the interface by name yet)"));
+    expect(warnings).toEqual(["no COMMANDCODE_API_KEY: sessions cannot call a model"]);
     expect(
       h
         .parsed()
         .filter((e) => e.level === "warn")
         .map((e) => e.message),
     ).toEqual(warnings);
-    expect(report.backends).toEqual({ worker: false, kit: true });
-    expect(report.lines).toContainEqual(info("desktop tool: the desktop kit is present"));
+    expect(report.backends).toEqual({ browser: true, desktop: true });
+    expect(report.lines).toContainEqual(info("computer tool: the agent-tools runner is present"));
     expect(h.parsed().at(-1)).toMatchObject({ message: "startup complete", up: true, module: "app" });
   });
 
@@ -90,22 +87,6 @@ describe("starting", () => {
     expect(h.parsed().find((e) => e.session === id)).toMatchObject({ module: "session-runtime", workspace: `s-${id.slice(2)}` });
   });
 
-  it("reports the browser worker as installed when it is on the search path it was given, whatever the machine has", async () => {
-    const bin = mkdtempSync(join(tmpdir(), "ogb-bin-"));
-    writeFileSync(join(bin, "sakura-browser-worker"), "#!/bin/sh\n");
-    const h = start({}, { backendSearchPath: `/nonexistent:${bin}` });
-    const report = await h.app.start();
-    expect(report.backends.worker).toBe(true);
-    expect(report.lines).toContainEqual({ level: "info", text: "browser tool: sakura-browser-worker found" });
-    expect(
-      h
-        .parsed()
-        .filter((e) => e.level === "warn")
-        .map((e) => String(e.message)),
-    ).not.toContainEqual(expect.stringContaining("sakura-browser-worker"));
-    rmSync(bin, { recursive: true, force: true });
-  });
-
   it("starts without the desk-daemon and says so; sessions would retry later", async () => {
     const h = start({}, { deskDown: true });
     const report = await h.app.start();
@@ -135,7 +116,7 @@ describe("starting", () => {
     symlinkSync(join(repoRoot, "packages"), join(root, "packages"));
     const partial = start({ OGB_APP_ROOT: root });
     const report = await partial.app.start();
-    expect(report.plugins.skipped.map((s) => s.name)).toEqual(["mail-sim"]);
+    expect(report.plugins.skipped.map((s) => s.name)).toEqual(["mail-sim", "mail-temp", "mail-outlook", "mail-gmail"]);
     expect(report.profiles).toEqual(["general"]);
     expect(report.lines.some((l) => l.level === "warn" && l.text.startsWith("plugin mail-sim not loaded"))).toBe(true);
     rmSync(root, { recursive: true, force: true });
@@ -269,5 +250,61 @@ describe("the start-up report for the page", () => {
     const report = await h.app.start();
     const options = await api(h.base(report), "/api/options");
     expect(options.json().startup).toEqual(report.lines);
+  });
+});
+
+describe("real mail (docs/25)", () => {
+  const MAIL = { OGB_TEMP_MAIL_URL: "https://mail-api.example.test", OGB_TEMP_MAIL_DOMAIN: "mail.test", OGB_MAIL_TO: "me@home.test" };
+
+  it("with a deployment and the person's address: the mail channel writes from vesper@domain, every bot gets its own address, the admin password leaves the environment", async () => {
+    const site = createFakeTempMail({ domain: "mail.test" });
+    const h = start({ COMMANDCODE_API_KEY: KEY, ...MAIL, OGB_TEMP_MAIL_ADMIN: site.adminPassword }, { fetch: site.fetch });
+    const report = await h.app.start();
+    expect(report.plugins.loaded).toContain("mail-temp");
+    expect(h.parsed().find((line) => line.message === "mail channel on")?.from).toBe("vesper@mail.test");
+    expect(h.env.OGB_TEMP_MAIL_ADMIN).toBeUndefined();
+    expect(h.logs.join("\n")).not.toContain(site.adminPassword);
+    const options = await api(h.base(report), "/api/options");
+    expect(options.status).toBe(200);
+  });
+
+  it("a wrong admin password: the box starts without the mail channel and says why", async () => {
+    const site = createFakeTempMail({ domain: "mail.test" });
+    const h = start({ COMMANDCODE_API_KEY: KEY, ...MAIL, OGB_TEMP_MAIL_ADMIN: "wrong-password" }, { fetch: site.fetch });
+    await h.app.start();
+    expect(h.parsed().some((line) => line.message === "the mail channel is off: its address could not be opened")).toBe(true);
+  });
+
+  it("without a deployment there is no mail plugin in the built-in profiles and no mail channel", async () => {
+    const h = start({ COMMANDCODE_API_KEY: KEY, OGB_MAIL_TO: "me@home.test" });
+    await h.app.start();
+    expect(h.parsed().some((line) => String(line.message).startsWith("mail channel"))).toBe(false);
+  });
+});
+
+describe("chat bridges (docs/26 4.3)", () => {
+  it("chat.json names a Matrix bridge: it is on, its token a secret reference; a bridge that cannot be reached leaves the box up", async () => {
+    const server = createFakeMatrix({ token: "mx-tok-0123" });
+    const h = start({ COMMANDCODE_API_KEY: KEY, OGB_SECRET_ENV: "OGB_MATRIX_TOKEN", OGB_MATRIX_TOKEN: "mx-tok-0123" }, { fetch: server.fetch });
+    mkdirSync(join(h.dataDir, "config"), { recursive: true });
+    const bridge = { name: "matrix", kind: "matrix", url: "https://matrix.example.test", token: "env:OGB_MATRIX_TOKEN", person: ["@me:x"], personRoom: "!dm" };
+    writeFileSync(
+      join(h.dataDir, "config", "chat.json"),
+      JSON.stringify({ bridges: [bridge, { ...bridge, name: "down", url: "https://down.example.test", token: "env:OGB_MATRIX_TOKEN_MISSING" }] }),
+    );
+    await h.app.start();
+    expect(h.parsed().find((l) => l.message === "chat bridge on")?.bridge).toBe("matrix");
+    expect(h.parsed().some((l) => l.message === "a chat bridge is off: it could not be opened" && l.bridge === "down")).toBe(true);
+    expect(h.logs.join("\n")).not.toContain("mx-tok-0123");
+  });
+
+  it("a malformed chat.json stops the start and names the field", async () => {
+    const h = start({ COMMANDCODE_API_KEY: KEY });
+    mkdirSync(join(h.dataDir, "config"), { recursive: true });
+    writeFileSync(
+      join(h.dataDir, "config", "chat.json"),
+      JSON.stringify({ bridges: [{ name: "x", kind: "irc", url: "https://a.test", person: ["@me"], personRoom: "!dm" }] }),
+    );
+    await expect(h.app.start()).rejects.toThrow(/'kind' must be matrix or satori/);
   });
 });

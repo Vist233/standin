@@ -3,7 +3,7 @@ import type { Socket } from "node:net";
 import { MAX_FILE_BYTES, OgbError } from "@vesper/contracts";
 import { Api } from "./api.ts";
 import { Guard, isLoopbackAddress } from "./guard.ts";
-import { describeFailure, HttpFailure, sendJson } from "./http.ts";
+import { describeFailure, readRawBody, HttpFailure, sendJson } from "./http.ts";
 import { refuseUpgrade, relayUpgrade } from "./relay.ts";
 import { serveStatic } from "./static.ts";
 import { TicketBook } from "./tickets.ts";
@@ -21,6 +21,9 @@ const DEFAULT_LIMITS: GatewayLimits = {
 };
 
 const WS_PATH = /^\/ws\/([A-Za-z0-9_-]{1,64})\/(view|takeover)$/;
+/** `/hooks/<bot>/<hook>`: a webhook of one bot (docs/26 3.4). */
+const HOOK_PATH = /^\/hooks\/([A-Za-z0-9_-]{1,64})\/([a-z][a-z0-9-]{0,31})$/;
+const MAX_HOOK_BODY = 64 * 1024;
 
 export function createGateway(options: GatewayOptions): Gateway {
   const limits: GatewayLimits = { ...DEFAULT_LIMITS, ...options.limits };
@@ -38,6 +41,23 @@ export function createGateway(options: GatewayOptions): Gateway {
       const method = req.method ?? "GET";
       const isRead = method === "GET" || method === "HEAD";
       guard.checkHostAndOrigin(req.headers, { originRequired: false });
+
+      const hook = HOOK_PATH.exec(url.pathname);
+      if (hook) {
+        // A webhook (docs/26 3.4): outside the API's own token; the hook's token opens it. Every refusal looks the same.
+        if (method !== "POST") throw new HttpFailure(405, "invalid_input", "webhooks are POST");
+        const token = url.searchParams.get("token") ?? /^Bearer (.{1,200})$/.exec(req.headers.authorization ?? "")?.[1] ?? "";
+        const body = (await readRawBody(req, MAX_HOOK_BODY)).toString("utf8");
+        const header = (name: string) => {
+          const value = req.headers[name];
+          return typeof value === "string" ? value : undefined;
+        };
+        const delivery = header("x-github-delivery") ?? header("idempotency-key") ?? header("x-delivery-id");
+        const accepted = await options.runtime.receiveHook(hook[1] as string, hook[2] as string, token, body, delivery);
+        if (!accepted) throw new HttpFailure(404, "not_found", "no such hook");
+        sendJson(res, 202, { accepted: true });
+        return;
+      }
 
       if (url.pathname.startsWith("/api/")) {
         if (url.pathname !== "/api/health") guard.checkBearer(req.headers);

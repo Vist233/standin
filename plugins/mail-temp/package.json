@@ -1,0 +1,12 @@
+{
+  "name": "@vesper/plugin-mail-temp",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Each bot's own mail address on the owner's domain, through the owner's cloudflare_temp_email deployment.",
+  "license": "MIT",
+  "dependencies": {
+    "@vesper/connectors": "*",
+    "@vesper/contracts": "*"
+  }
+}

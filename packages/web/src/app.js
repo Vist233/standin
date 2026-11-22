@@ -90,7 +90,7 @@ async function pollHealth() {
 }
 
 // ---------- the rail ----------
-/** @type {{ id: string, title: string, createdAt: number, notice?: { at: number, text: string }, last?: { at: number, who: "person" | "bot", text: string }, star?: string, summary?: string, next?: string, status: string, state: { run: string, held: boolean, queued: number } | null, pending: number, lastRunEnd: string | null, takeover: boolean }[]} */
+/** @type {{ id: string, title: string, createdAt: number, notice?: { at: number, text: string }, last?: { at: number, who: "person" | "bot", text: string }, star?: string, yolo?: boolean, summary?: string, next?: string, status: string, state: { run: string, held: boolean, queued: number } | null, pending: number, lastRunEnd: string | null, takeover: boolean }[]} */
 let rows = [];
 /** @type {{ profiles: string[], defaultProfile?: string, models: string[], takeover: boolean, liveView: boolean, files: boolean, limits: { fileBytes: number, files: number }, startup: unknown[] }} */
 let options = { profiles: [], models: [], takeover: false, liveView: false, files: false, limits: { fileBytes: 25 * 1024 * 1024, files: 20 }, startup: [] };
@@ -291,6 +291,24 @@ async function finishRename(/** @type {boolean} */ save) {
   await refreshSessions();
 }
 
+// ---------- yolo: the person switches this bot's approvals and review off and on, while it runs ----------
+$("yolo").addEventListener("click", async () => {
+  const row = rows.find((candidate) => candidate.id === selected);
+  if (!row) return;
+  const on = !row.yolo;
+  if (
+    on &&
+    !window.confirm(`Switch off approvals and review for ${row.title}? It will send, post and delete without asking you until you switch them back on.`)
+  )
+    return;
+  try {
+    await api.updateSession(row.id, { yolo: on });
+  } catch (error) {
+    report(error);
+  }
+  await refreshSessions();
+});
+
 $("bot-name").addEventListener("click", startRename);
 $("bot-rename").addEventListener("keydown", (event) => {
   const key = /** @type {KeyboardEvent} */ (event);
@@ -476,7 +494,12 @@ function render() {
 function renderHeader() {
   const row = rows.find((candidate) => candidate.id === selected);
   $("session-title").hidden = !row;
+  $("yolo").hidden = !row;
   if (row) {
+    $("yolo").setAttribute("aria-pressed", String(Boolean(row.yolo)));
+    $("yolo").title = row.yolo
+      ? "Yolo is on: this bot runs every tool without asking you and without review. Click to switch approvals and review back on."
+      : "Approvals and review for this bot: on. Click to switch them off (yolo).";
     $("bot-star").replaceChildren(avatar(row, 22));
     $("bot-name").textContent = row.title;
     const status = presence(

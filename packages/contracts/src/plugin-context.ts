@@ -42,6 +42,15 @@ export interface RunResult {
   truncated: boolean;
 }
 
+/** A program started for a workspace that keeps running (a tool's runner): its pipes and how to stop it. `child_process.spawn`'s result fits. */
+export interface WorkspaceProcess {
+  readonly stdin: NodeJS.WritableStream | null;
+  readonly stdout: NodeJS.ReadableStream | null;
+  readonly stderr: NodeJS.ReadableStream | null;
+  kill(signal?: NodeJS.Signals): boolean;
+  once(event: "exit", listener: (code: number | null) => void): unknown;
+}
+
 /**
  * One workspace as a tool sees it. A tool is built with exactly one handle and has no way to name another workspace
  * (isolation by construction, docs/07 section 5). Later tasks (desk-daemon, workspace-client) add what a handle can
@@ -62,6 +71,11 @@ export interface WorkspaceHandle {
    * The interface is the same when a later multi-user version runs the command in a microVM through a tool channel.
    */
   run(command: readonly string[], options?: RunOptions): Promise<RunResult>;
+  /**
+   * Starts a program for this workspace that keeps running, with the same directory and environment as `run` (`env` adds names; the
+   * workspace's own cannot be set). The caller talks to it through its pipes and ends it.
+   */
+  spawn(command: readonly string[], options?: { env?: Record<string, string> }): WorkspaceProcess;
 }
 
 /** The only thing a plugin receives from the runtime (docs/08 section 2, rule 1). */

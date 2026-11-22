@@ -2,7 +2,7 @@ import { reviewPlugin } from "sakura-agent";
 import { createFauxClient } from "sakura-agent/testing";
 import { afterEach, describe, expect, it } from "vitest";
 import { rankTools } from "../src/search-tools.ts";
-import { createRig, loadPlugins, type Rig } from "../src/testing/index.ts";
+import { createRig, loadPlugins, type Rig, lastMessage } from "../src/testing/index.ts";
 import { callCount, gatedPlugin, installGate, resetCalls } from "./helpers.ts";
 
 const rigs: Rig[] = [];
@@ -96,7 +96,7 @@ describe("search wiring: only the original tools plus tool_search and tool_call 
     const seen: string[] = [];
     const { runtime, faux, reviewer } = rigWithReviewer({
       reviewer: (request) => {
-        const text = JSON.stringify(request.messages.at(-1));
+        const text = JSON.stringify(lastMessage(request as never));
         seen.push(text);
         return text.includes("tool: gated") ? DENY : ALLOW;
       },
@@ -132,7 +132,7 @@ describe("approval modes from the plugin's manifest", () => {
       reviewer: () => ALLOW,
       approval: { gated: "ask" },
       script: (request, index) => {
-        const text = JSON.stringify(request.messages.at(-1));
+        const text = JSON.stringify(lastMessage(request as never));
         if (index === 0 || text.includes("approved request") || text.includes("Repeat exactly"))
           return { toolCalls: [{ name: "tool_call", args: { name: "gated", args: { n: 1 } } }] };
         return { text: "waiting for the person" };
@@ -164,7 +164,7 @@ describe("approval modes from the plugin's manifest", () => {
       script: (request, index) =>
         index === 0
           ? { toolCalls: [{ name: "tool_call", args: { name: "gated", args: {} } }] }
-          : { text: `last: ${JSON.stringify(request.messages.at(-1)?.content).slice(0, 60)}` },
+          : { text: `last: ${JSON.stringify(lastMessage(request as never)?.content).slice(0, 60)}` },
     });
     const { id } = await runtime.createSession();
     await runtime.send(id, "do it");

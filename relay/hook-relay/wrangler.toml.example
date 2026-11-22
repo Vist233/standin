@@ -1,0 +1,8 @@
+# Copy to wrangler.toml, fill in the KV namespace id, then: npx wrangler deploy; npx wrangler secret put RELAY_KEY
+name = "vesper-hook-relay"
+main = "worker.mjs"
+compatibility_date = "2026-11-01"
+
+[[kv_namespaces]]
+binding = "HOOKS"
+id = "<your KV namespace id>"

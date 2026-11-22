@@ -1,0 +1,15 @@
+{
+  "name": "mail-outlook",
+  "version": "0.1.0",
+  "description": "The person's Outlook mailbox through Microsoft Graph. One bot owns it: the first that the person signs in with (outlook_connect, a device code). Needs OGB_OUTLOOK_CLIENT_ID (the owner's app registration, a public client).",
+  "license": "MIT",
+  "extensions": {
+    "vesper": {
+      "tools": "dist/tools.js",
+      "sources": "dist/sources.js",
+      "promptSection": "prompt.md",
+      "effects": ["read", "network", "irreversible"],
+      "defaultEnabled": false
+    }
+  }
+}

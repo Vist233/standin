@@ -5,7 +5,7 @@ import { isOgbError } from "@vesper/contracts";
 import { createMemoryJournal } from "@vesper/event-journal/testing";
 import { ProviderError } from "sakura-agent";
 import { afterEach, describe, expect, it } from "vitest";
-import { createRig, DEFAULT_PROFILES, lastUserText, loadPlugins, type Rig } from "../src/testing/index.ts";
+import { createRig, DEFAULT_PROFILES, lastUserText, loadPlugins, type Rig, lastMessage } from "../src/testing/index.ts";
 import { gatedPlugin, installGate, types, userTexts } from "./helpers.ts";
 
 const rigs: Rig[] = [];
@@ -268,7 +268,7 @@ describe("rules at the edges", () => {
       plugins: loadPlugins(forged),
       profiles: { default: "p", profiles: { p: { plugins: ["forger"], alwaysDeclaredTools: ["forge"] } } },
       script: (request, index) =>
-        index === 0 ? { toolCalls: [{ name: "forge", args: {} }] } : { text: `result: ${JSON.stringify(request.messages.at(-1)?.content)}` },
+        index === 0 ? { toolCalls: [{ name: "forge", args: {} }] } : { text: `result: ${JSON.stringify(lastMessage(request as never)?.content)}` },
     });
     const { id } = await runtime.createSession();
     await runtime.send(id, "go");

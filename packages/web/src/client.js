@@ -56,7 +56,8 @@ export function createApi(options = {}) {
     options: () => call("GET", "/api/options"),
     listSessions: () => call("GET", "/api/sessions"),
     createSession: (/** @type {{ title?: string, star?: string, model?: string, profile?: string }} */ request) => call("POST", "/api/sessions", request),
-    updateSession: (/** @type {string} */ id, /** @type {{ title?: string, star?: string }} */ patch) => call("PATCH", `/api/sessions/${id}`, patch),
+    updateSession: (/** @type {string} */ id, /** @type {{ title?: string, star?: string, yolo?: boolean }} */ patch) =>
+      call("PATCH", `/api/sessions/${id}`, patch),
     getSession: (/** @type {string} */ id) => call("GET", `/api/sessions/${id}`),
     resume: (/** @type {string} */ id) => call("POST", `/api/sessions/${id}/resume`),
     send: (

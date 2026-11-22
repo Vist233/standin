@@ -16,6 +16,8 @@ export interface SessionRecord {
   model?: string;
   /** The bot's avatar: a preset star id chosen by the person (the page draws it). */
   star?: string;
+  /** Yolo: the person switched off this bot's approvals and review (switched at run time, on the page; never by the bot). */
+  yolo?: boolean;
   /** One line about the person's task, written by the runtime after each run. */
   summary?: string;
   /** Scheduled wake-ups of this bot, owned by the runtime's scheduler; the store keeps them as they are. */
@@ -44,7 +46,10 @@ export interface SessionStore {
   get(id: string): Promise<SessionRecord>;
   /** Sorted by creation time. Sessions whose record is damaged are reported, not hidden and not fatal. */
   list(): Promise<{ sessions: SessionRecord[]; damaged: string[] }>;
-  update(id: string, patch: Partial<Pick<SessionRecord, "title" | "status" | "star" | "summary" | "schedules" | "notice" | "last">>): Promise<SessionRecord>;
+  update(
+    id: string,
+    patch: Partial<Pick<SessionRecord, "title" | "status" | "star" | "yolo" | "summary" | "schedules" | "notice" | "last">>,
+  ): Promise<SessionRecord>;
   /** Removes everything of the session. Harmless when it does not exist. */
   delete(id: string): Promise<void>;
   paths(id: string): SessionPaths;
@@ -69,6 +74,7 @@ function isRecord(value: unknown, id: string): value is SessionRecord {
     "profile" in value &&
     (value.model === undefined || typeof value.model === "string") &&
     (value.star === undefined || typeof value.star === "string") &&
+    (value.yolo === undefined || typeof value.yolo === "boolean") &&
     (value.summary === undefined || typeof value.summary === "string") &&
     (value.schedules === undefined || Array.isArray(value.schedules)) &&
     (value.notice === undefined || (typeof value.notice === "object" && value.notice !== null)) &&
@@ -182,6 +188,7 @@ export function createFileSessionStore(options: { root: string; now?: () => numb
         ...(patch.title !== undefined ? { title: patch.title } : {}),
         ...(patch.status !== undefined ? { status: patch.status } : {}),
         ...(patch.star !== undefined ? { star: patch.star } : {}),
+        ...(patch.yolo !== undefined ? { yolo: patch.yolo } : {}),
         ...(patch.summary !== undefined ? { summary: patch.summary } : {}),
         ...(patch.schedules !== undefined ? { schedules: patch.schedules } : {}),
         ...(patch.notice !== undefined ? { notice: patch.notice } : {}),

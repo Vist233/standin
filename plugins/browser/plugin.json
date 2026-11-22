@@ -1,13 +1,15 @@
 {
   "name": "browser",
   "version": "0.1.0",
-  "description": "Use the workspace's web browser: open pages, read them, click, type, take screenshots. Each agent works in its own tabs.",
+  "description": "The workspace's browser, driven by Playwright code in a session that stays (agent-tools). Each agent has its own tab.",
   "license": "MIT",
   "extensions": {
     "vesper": {
       "tools": "dist/tools.js",
       "promptSection": "prompt.md",
-      "effects": ["network"],
+      "effects": [
+        "network"
+      ],
       "defaultEnabled": true
     }
   }

@@ -44,6 +44,13 @@ describe("tools over a provider: only what the provider has", () => {
     expect(createConnectorTools(readOnly).map((t) => t.name)).not.toContain("mail_send");
   });
 
+  it("each mailbox names its tools, so a bot with its own address and the person's Outlook has no two tools of one name", () => {
+    const outlook = createConnectorTools(createMemoryProvider({ calendar: false, address: "me@outlook.test" }), { mailName: "outlook" });
+    expect(outlook.map((t) => t.name)).toEqual(["outlook_list", "outlook_read", "outlook_send"]);
+    expect(outlook[0]?.description).toContain("outlook_read");
+    expect(outlook[0]?.description).toContain("me@outlook.test");
+  });
+
   it("declares sending and changing events irreversible (so they need the person's approval) and everything else read", () => {
     const effects = Object.fromEntries(createConnectorTools(createMemoryProvider()).map((t) => [t.name, t.effect]));
     expect(effects).toEqual({
@@ -176,5 +183,36 @@ describe("watch sources: notices become signals", () => {
 
   it("a provider with no reader and no calendar has no sources", () => {
     expect(createWatchSources({ provider: {}, plugin: "x", sink: { emit: () => {} } })).toEqual([]);
+  });
+});
+
+describe("the mail watch's cursor on disk (cursorIn)", () => {
+  it("a restarted event source reports the mail that came while it was down, once, and nothing older", async () => {
+    const { mkdtempSync, rmSync, existsSync } = await import("node:fs");
+    const { tmpdir } = await import("node:os");
+    const { join } = await import("node:path");
+    const { cursorIn } = await import("../src/index.ts");
+    const dir = mkdtempSync(join(tmpdir(), "ogb-cursor-"));
+    try {
+      const file = join(dir, "data", "cursor.json");
+      expect(cursorIn(undefined)).toEqual({});
+      const provider = createMemoryProvider();
+      provider.deliver({ from: "a@x.test", subject: "Old", body: "x" });
+      const texts: string[] = [];
+      const sink: SignalSink = { emit: (_t, draft) => void texts.push(draft.text) };
+      const [first] = createWatchSources({ provider, plugin: "mail-sim", sink, cursorFile: file });
+      first?.start();
+      provider.deliver({ from: "b@x.test", subject: "Up", body: "x" });
+      first?.stop();
+      expect(existsSync(file)).toBe(true);
+      provider.deliver({ from: "c@x.test", subject: "Down", body: "x" }); // the box is down
+      const [second] = createWatchSources({ provider, plugin: "mail-sim", sink, cursorFile: file });
+      second?.start();
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      second?.stop();
+      expect(texts.map((t) => t.replace(/^New mail \S+ from /, ""))).toEqual(["b@x.test: Up", "c@x.test: Down"]);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 });

@@ -1,16 +1,11 @@
 import type { PluginContext } from "@vesper/contracts";
 import type { Tool } from "sakura-agent";
-import { createHandoffPort } from "./adapter.ts";
-import { secretReview } from "./secret-scan.ts";
-import { createHandoffTool } from "./tool.ts";
+import { createHandoffTool } from "sakura-agent-tools/handoff";
 
-/** Entry of the plugin (bundled to dist/tools.js). One store for all sessions; this agent's directory and id are passed per handle. */
+/**
+ * Entry of the plugin (bundled to dist/tools.js). The `handoff` tool of agent-tools: one store for every session of the box (the plugin's shared
+ * directory); each agent publishes from and pulls into its own files directory. Packages with secrets or personal paths are refused.
+ */
 export function createTools(ctx: PluginContext): Tool[] {
-  const port = createHandoffPort({
-    storeRoot: ctx.sharedDataDir,
-    workDir: ctx.workspace.filesDir,
-    agentId: ctx.workspace.workspaceId,
-    hooks: { review: secretReview },
-  });
-  return [createHandoffTool({ port, workDir: ctx.workspace.filesDir })];
+  return [createHandoffTool({ storeRoot: ctx.sharedDataDir, workDir: ctx.workspace.filesDir, agentId: ctx.workspace.workspaceId })];
 }

@@ -235,11 +235,13 @@ export class Api {
     });
 
     route("PATCH", "/api/sessions/:id", async (call) => {
-      // A bot's name and star; the runtime checks them.
+      // A bot's name and star, and yolo (its approvals and review off); the runtime checks them.
       const fields = await body(call);
+      if (fields.yolo !== undefined && typeof fields.yolo !== "boolean") throw new HttpFailure(400, "invalid_input", "yolo is true or false");
       const patch = {
         ...(fields.title !== undefined ? { title: textField(fields, "title", 80) as string } : {}),
         ...(fields.star !== undefined ? { star: textField(fields, "star", 24) as string } : {}),
+        ...(typeof fields.yolo === "boolean" ? { yolo: fields.yolo } : {}),
       };
       json(call, { session: await runtime.updateSession(call.params[0] as string, patch) });
     });

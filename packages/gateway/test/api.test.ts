@@ -236,6 +236,15 @@ describe("a bot's name and star", () => {
     expect(renamed.json.session).toMatchObject({ title: "Scout", star: "dawn" });
     expect((await r.probe.call("PATCH", "/api/sessions/s_a", { body: { title: "" } })).status).toBe(400);
   });
+
+  it("PATCH switches yolo with true or false only", async () => {
+    const r = await rig();
+    r.runtime.add("s_a");
+    const on = await r.probe.call("PATCH", "/api/sessions/s_a", { body: { yolo: true } });
+    expect(on.status).toBe(200);
+    expect(on.json.session).toMatchObject({ yolo: true });
+    expect((await r.probe.call("PATCH", "/api/sessions/s_a", { body: { yolo: "on" } })).status).toBe(400);
+  });
 });
 
 describe("request handling", () => {

@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { isOgbError } from "@vesper/contracts";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { createHostWorkspaces, runInWorkspace, workspaceEnvironment } from "../src/index.ts";
+import { createHostWorkspaces, runInWorkspace, spawnInWorkspace, workspaceEnvironment } from "../src/index.ts";
 import { createFakeWorkspaceHost } from "@vesper/workspace-client/testing";
 
 const dirs: string[] = [];
@@ -70,9 +70,53 @@ describe("running a command for a workspace", () => {
     });
   });
 
+  it("gives programs the box's time zone, so a bot's clock agrees with its schedule (testers' B-2)", () => {
+    const saved = process.env.TZ;
+    try {
+      process.env.TZ = "Asia/Shanghai";
+      expect(workspaceEnvironment(target()).TZ).toBe("Asia/Shanghai");
+      delete process.env.TZ;
+      expect(workspaceEnvironment(target())).not.toHaveProperty("TZ");
+    } finally {
+      if (saved === undefined) delete process.env.TZ;
+      else process.env.TZ = saved;
+    }
+  });
+
+  it("puts programs on the display's accessibility bus, with GTK's bridge on, when the workspace has one", () => {
+    expect(workspaceEnvironment({ ...target(), accessibilityBus: "unix:path=/run/a11y-bus" })).toMatchObject({
+      DBUS_SESSION_BUS_ADDRESS: "unix:path=/run/a11y-bus",
+      GTK_MODULES: "gail:atk-bridge",
+      NO_AT_BRIDGE: "0",
+    });
+    expect(workspaceEnvironment(target())).not.toHaveProperty("DBUS_SESSION_BUS_ADDRESS");
+  });
+
+  it("starts a program that keeps running, in the files directory with the workspace's environment and nothing inherited", async () => {
+    const t = target();
+    const child = spawnInWorkspace(
+      t,
+      [
+        node,
+        "-e",
+        "process.stdin.on('data', (d) => process.stdout.write(JSON.stringify({ got: String(d).trim(), cwd: process.cwd(), key: process.env.ANTHROPIC_API_KEY ?? null, extra: process.env.TOOL_VAR })))",
+      ],
+      { env: { TOOL_VAR: "x" } },
+    );
+    let out = "";
+    child.stdout?.on("data", (chunk: Buffer) => {
+      out += chunk.toString();
+    });
+    child.stdin?.write("hello\n");
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    expect(JSON.parse(out)).toEqual({ got: "hello", cwd: t.filesDir, key: null, extra: "x" });
+    child.kill("SIGKILL");
+    expect(() => spawnInWorkspace(t, [node], { env: { PATH: "/evil" } })).toThrow(/belongs to the workspace/);
+  });
+
   it("refuses to let a caller set the workspace's own variables or odd names", () => {
     const t = target();
-    for (const name of ["PATH", "HOME", "DISPLAY", "LANG", "OGB_CDP_URL", "OGB_FILES_DIR", "OGB_WORKSPACE_ID", "XDG_CONFIG_HOME"]) {
+    for (const name of ["PATH", "HOME", "DISPLAY", "LANG", "OGB_CDP_URL", "OGB_FILES_DIR", "OGB_WORKSPACE_ID", "XDG_CONFIG_HOME", "DBUS_SESSION_BUS_ADDRESS"]) {
       expect(() => workspaceEnvironment(t, { [name]: "x" }), name).toThrow(/belongs to the workspace/);
     }
     expect(() => workspaceEnvironment(t, { "lower-case": "x" })).toThrow(/not allowed/);

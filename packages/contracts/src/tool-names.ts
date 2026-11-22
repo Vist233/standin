@@ -8,5 +8,5 @@ export const CORE_TOOL_NAMES = {
   /** Finding and running every other tool. */
   search: ["tool_search", "tool_call"],
   /** Tools of the session itself (speaking to the person, asking them, describing the workspace). */
-  session: ["send_to_user", "ask_human", "workspace_info", "schedule", "remember_person", "session_search"],
+  session: ["send_to_user", "ask_human", "workspace_info", "schedule", "hook", "remember_person", "session_search"],
 } as const;

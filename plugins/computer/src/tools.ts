@@ -1,25 +1,22 @@
 import type { PluginContext } from "@vesper/contracts";
 import type { Tool } from "sakura-agent";
-import type { DesktopBackend } from "./backend.ts";
-import { createFakeDesktop } from "./fake-backend.ts";
-import { createGuiKitBackend } from "./gui-kit-backend.ts";
-import { createDesktopTool } from "./desktop-tool.ts";
+import { createComputerTool } from "sakura-agent-tools/computer";
 
-const NOT_BUILT = "No desktop backend for this display name (expected an X display such as :101).";
+/** agent-tools lives at <app root>/vendor/agent-tools (scripts/sync-agent-tools.sh); the image's app root is /opt/ogb. */
+const TOOLS = `${process.env.OGB_APP_ROOT || "/opt/ogb"}/vendor/agent-tools`;
 
-function unavailable(): DesktopBackend {
-  const fail = async (): Promise<never> => {
-    throw new Error(NOT_BUILT);
-  };
-  return { tree: fail, screenshot: fail, click: fail, drag: fail, path: fail, launch: fail, type: fail, set: fail, key: fail, scroll: fail };
-}
-
-/** Entry of the plugin (bundled to dist/tools.js). A display named `fake:...` gets the in-memory demo desktop. */
+/**
+ * Entry of the plugin (bundled to dist/tools.js). The `computer` tool of agent-tools on the workspace's desktop: the agent writes Python against the
+ * accessibility tree, the picture and the input; the runner runs as a program of the workspace, whose environment already names the display and its
+ * accessibility bus.
+ */
 export function createTools(ctx: PluginContext): Tool[] {
-  const display = ctx.workspace.display;
-  if (display === undefined) return [];
-  // A real display (":101") gets the owner's gui kit; a `fake:` display gets the in-memory demo desktop.
-  const backend = display.startsWith("fake:") ? createFakeDesktop() : /^:\d+$/.test(display) ? createGuiKitBackend({ run: ctx.workspace.run }) : unavailable();
-  // The agent uses the desktop itself; a large desktop job goes to a sub-agent (`delegate`), which has this tool too.
-  return [createDesktopTool(backend)];
+  if (ctx.workspace.display === undefined) return [];
+  return [
+    createComputerTool({
+      env: () => ({ COMPUTER_USE_SHOTS: `${ctx.workspace.filesDir}/.screens` }),
+      runner: { program: "python3", args: ["-u", `${TOOLS}/dist/computer/runner/runner.py`] },
+      spawn: (program, args, env) => ctx.workspace.spawn([program, ...args], { env }),
+    }),
+  ];
 }

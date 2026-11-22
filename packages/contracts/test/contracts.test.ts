@@ -15,6 +15,16 @@ describe("OgbError", () => {
     expect(isOgbError(new Error("x"))).toBe(false);
   });
 
+  it("is recognised when it comes from a bundled plugin's own copy of the class (testers' B-8)", () => {
+    class OgbError extends Error {
+      readonly kind = "not_found";
+      override name = "OgbError";
+    }
+    expect(isOgbError(new OgbError("no such secret"), "not_found")).toBe(true);
+    expect(isOgbError(new OgbError("no such secret"), "denied")).toBe(false);
+    expect(isOgbError({ name: "Error", kind: "not_found" }, "not_found")).toBe(false);
+  });
+
   it("lists every kind once", () => {
     expect(new Set(ERROR_KINDS).size).toBe(ERROR_KINDS.length);
   });

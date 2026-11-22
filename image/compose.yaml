@@ -24,6 +24,19 @@ services:
       - OGB_RUN_TURNS
       - OGB_RUN_TOKENS
       - OGB_RUN_SECONDS
+      - OGB_TELEGRAM_TOKEN # the Telegram channel: the bot's token (a secret, taken out of the environment at start) ...
+      - OGB_TELEGRAM_CHAT # ... and the person's chat id; both set turns the channel on
+      - OGB_TEMP_MAIL_URL # real mail (docs/25): the cloudflare_temp_email deployment's API address ...
+      - OGB_TEMP_MAIL_DOMAIN # ... its domain; both set give every bot its own address
+      - OGB_TEMP_MAIL_ADMIN # the deployment's admin password (a secret, taken out of the environment at start)
+      - OGB_TEMP_MAIL_SITE_PASSWORD # the deployment's site password, when it has one (a secret)
+      - OGB_MAIL_TO # the person's own address: the mail channel writes there from vesper@<domain>
+      - OGB_OUTLOOK_CLIENT_ID # the person's Outlook: the owner's app registration (public client); one bot holds the account
+      - OGB_OUTLOOK_TENANT # consumers (Outlook.com), organizations, or a tenant id; default common
+      - OGB_GMAIL_ADDRESS # the person's Gmail (IMAP and SMTP); one bot holds it after the person approves gmail_connect ...
+      - OGB_GMAIL_APP_PASSWORD # ... with an app password (a secret, taken out of the environment at start)
+      - OGB_HOOK_RELAY_URL # webhooks from outside: the hook relay's https address (relay/hook-relay, deployed apart) ...
+      - OGB_HOOK_RELAY_KEY # ... and its key (a secret, taken out of the environment at start)
       - TZ # the person's time zone for scheduled 'daily HH:MM' jobs (for example Asia/Singapore); unset is UTC
     ports:
       - "127.0.0.1:8787:8787"

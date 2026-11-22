@@ -83,10 +83,21 @@ export function createMemoryProvider(options: { address?: string; now?: () => nu
           found.unread = false;
           return { ...found };
         },
-        watch(onMail): Stop {
-          const wrapped = (m: MailMessage) => onMail(summary(m));
-          mailWatchers.add(wrapped);
-          return () => void mailWatchers.delete(wrapped);
+        watch(onMail, watchOptions): Stop {
+          // The cursor is the arrival number of the newest inbox message reported (ids are m<number>).
+          const number = (m: MailMessage) => Number(m.id.slice(1));
+          const inbox = () => messages.filter((m) => m.folder === "inbox");
+          let position = watchOptions?.after !== undefined ? Number(watchOptions.after) : Math.max(0, ...inbox().map(number));
+          const report = (m: MailMessage) => {
+            if (m.folder !== "inbox" || number(m) <= position) return;
+            position = number(m);
+            onMail(summary(m));
+            watchOptions?.onCursor?.(String(position));
+          };
+          for (const m of inbox().sort((a, b) => number(a) - number(b))) report(m);
+          watchOptions?.onCursor?.(String(position));
+          mailWatchers.add(report);
+          return () => void mailWatchers.delete(report);
         },
       },
       sender: {

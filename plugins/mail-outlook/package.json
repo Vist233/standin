@@ -1,0 +1,12 @@
+{
+  "name": "@vesper/plugin-mail-outlook",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "The person's Outlook (Outlook.com or Microsoft 365) through Microsoft Graph, connected to one bot by a device-code sign-in.",
+  "license": "MIT",
+  "dependencies": {
+    "@vesper/connectors": "*",
+    "@vesper/contracts": "*"
+  }
+}

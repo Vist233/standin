@@ -18,6 +18,11 @@ export interface DaemonConfig {
   readonly openbox: Launcher;
   readonly chromium: Launcher;
   readonly x11vnc: Launcher;
+  /**
+   * A D-Bus session per display, where desktop programs publish their widgets (the accessibility tree the agent's computer tool reads; the
+   * AT-SPI service is started by D-Bus activation). Absent: no bus, and programs publish nothing.
+   */
+  readonly accessibilityBus?: Launcher;
   /** Chromium refuses to run as root without it; the container runs as root. */
   readonly noSandbox: boolean;
   /** Most workspaces running at once (memory is the limit: about 320 MiB each, docs/11 D10); more may exist stopped. */

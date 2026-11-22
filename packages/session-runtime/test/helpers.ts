@@ -43,9 +43,7 @@ export function installGate(): Gate {
 
 export const types = (events: SessionEvent[]) => events.map((e) => e.type);
 
-export function userTexts(request: { messages: { role: string; content: { type: string; text?: string }[] }[] }): string[] {
-  return request.messages.filter((m) => m.role === "user").map((m) => m.content.map((c) => (c.type === "text" ? (c.text ?? "") : "")).join(""));
-}
+export { userTexts } from "../src/testing/index.ts";
 
 export function callCount(): number {
   return ((globalThis as Record<string, unknown>).__ogbCalls as number | undefined) ?? 0;

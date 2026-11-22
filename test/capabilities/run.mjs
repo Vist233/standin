@@ -138,7 +138,7 @@ const SCENARIOS = [
         ok(colours > 1, `the picture is not blank (${colours} colours)`);
       }
       ok(
-        (await bot.toolCalls("desktop")).length + (await bot.toolCalls("delegate")).length > 0,
+        (await bot.toolCalls("computer")).length + (await bot.toolCalls("delegate")).length > 0,
         "it used the desktop tool or a sub-agent (not xdotool from bash)",
       );
     },

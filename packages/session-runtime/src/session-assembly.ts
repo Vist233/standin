@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import { mkdir, symlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { renderAgentsMd } from "@vesper/agents-md";
-import { CORE_TOOL_NAMES, OgbError, type PluginContext, type SessionEvent, type SignalDraft } from "@vesper/contracts";
+import { CORE_TOOL_NAMES, OgbError, type Outgoing, type PluginContext, type SessionEvent, type SignalDraft } from "@vesper/contracts";
 import { createFileJournal, type EventJournal } from "@vesper/event-journal";
 import type { LoadedPlugin } from "@vesper/plugin-host";
 import type { ResolvedProfile } from "@vesper/profiles";
@@ -16,9 +16,10 @@ import { workspaceShell } from "./agent-environment.ts";
 import { createPersonTool, personPlugin } from "./person.ts";
 import { createSessionSearchTool } from "./session-search.ts";
 import { skillsPlugin } from "./skills.ts";
+import type { HookRegistry } from "./hooks.ts";
 import type { Scheduler } from "./scheduler.ts";
 import { lastReply, summarize, summarySource } from "./summary.ts";
-import { defaultSafetyPlugins } from "./safety.ts";
+import { defaultSafetyPlugins, switchableReview } from "./safety.ts";
 import { type Authorize, createSearchTools } from "./search-tools.ts";
 import { deliverQueued, endTakeover, questionTimedOut, handbackTimedOut } from "./takeover.ts";
 import type { SessionRuntimeDeps } from "./types.ts";
@@ -33,6 +34,8 @@ export interface OpenSession {
   profile: ResolvedProfile;
   stopUnits: () => Promise<void>;
   approvals: ApprovalBook;
+  /** Yolo, as the person last switched it: read by the approval gate and the reviewer at every tool call. */
+  yolo: { on: boolean };
   workspaceId: string;
   /** Where the session's files are, as the agent's tools see the path. */
   filesDir: string;
@@ -57,12 +60,16 @@ export interface AssemblyContext {
   signal: (sessionId: string, draft: SignalDraft) => Promise<void>;
   /** The bots' clock (scheduled wake-ups). */
   scheduler: Scheduler;
+  /** The bots' webhooks. */
+  hooks: HookRegistry;
   /** The person's profile shared by all bots (USER.md). */
   personFile: string;
   /** True once after a scheduled job was delivered to this bot: the run's reply is then a notice for the person. */
   takeNotice: (sessionId: string) => boolean;
   /** Reads a bot's journal (for `session_search` across bots). */
   readJournal: (sessionId: string) => Promise<readonly SessionEvent[]>;
+  /** Gives the person something on every channel (the page first). */
+  deliver: (message: Outgoing) => Promise<void>;
 }
 
 /** The session's AGENTS.md: written for a new session, and again if the file is gone; an existing one is the agent's to keep editing. */
@@ -147,7 +154,9 @@ export async function assembleSession(ctx: AssemblyContext, record: SessionRecor
   });
 
   const llm = await deps.models.get(profile.model);
-  const safety = (deps.safetyPlugins ?? defaultSafetyPlugins)(profile.floor, llm);
+  const yolo = { on: record.yolo === true };
+  const unchecked = () => yolo.on;
+  const safety = (deps.safetyPlugins ?? defaultSafetyPlugins)(profile.floor, llm, deps.reviewPolicy).map((plugin) => switchableReview(plugin, unchecked));
 
   // Tools: the original four, then `tool_search` and `tool_call`, then the tools the profile asks to be declared. Everything
   // else (core tools and plugin tools) is found by search. Each tool is wrapped by the approval mode of its manifest.
@@ -158,14 +167,22 @@ export async function assembleSession(ctx: AssemblyContext, record: SessionRecor
   };
   const catalog = [
     ...[
-      ...createCoreTools({ announce, workspace, sessionId: record.id, scheduler: ctx.scheduler }),
+      ...createCoreTools({
+        announce,
+        tell: async (kind, text) => ctx.deliver({ sessionId: record.id, from: (await deps.store.get(record.id)).title, kind, text, at: now() }),
+        workspace,
+        sessionId: record.id,
+        scheduler: ctx.scheduler,
+        hooks: ctx.hooks,
+        hookBaseUrl: deps.hookBaseUrl,
+      }),
       createPersonTool(ctx.personFile),
       createSessionSearchTool({
         bots: async () => (await deps.store.list()).sessions.filter((s) => s.status === "active").map(({ id, title }) => ({ id, title })),
         read: (id) => (id === record.id ? journal.read(id) : ctx.readJournal(id)),
       }),
     ].map((tool) => gate(tool, { mode: "auto", book: approvals, announce })),
-    ...snapshot.tools.map((tool) => gate(tool, { mode: snapshot.toolOwners[tool.name]?.approval ?? "auto", book: approvals, announce })),
+    ...snapshot.tools.map((tool) => gate(tool, { mode: snapshot.toolOwners[tool.name]?.approval ?? "auto", book: approvals, announce, bypass: unchecked })),
   ];
   const reviewer = safety.find((plugin) => typeof (plugin as { authorize?: unknown }).authorize === "function") as ReviewLike | undefined;
   reviewer?.exempt?.("tool_call"); // the inner call is reviewed under its own name by `tool_call` itself (search-tools.ts)
@@ -236,12 +253,8 @@ export async function assembleSession(ctx: AssemblyContext, record: SessionRecor
         if (reply && !/^\[SILENT\]$/.test(reply)) await deps.store.update(record.id, { last: { at: now(), who: "bot", text: reply.slice(0, 200) } });
         if (ctx.takeNotice(record.id)) {
           // A scheduled run: its reply is what the person should get, unless it chose not to disturb them.
-          if (reply && !/^\[SILENT\]$/.test(reply)) {
-            const notice = { at: now(), text: reply.slice(0, 300) };
-            await deps.store.update(record.id, { notice });
-            await bridge.actor?.announce("session.notice", notice);
-            deps.notify?.(record.id, { title: (await deps.store.get(record.id)).title, ...notice });
-          }
+          if (reply && !/^\[SILENT\]$/.test(reply))
+            await ctx.deliver({ sessionId: record.id, from: (await deps.store.get(record.id)).title, kind: "notice", text: reply.slice(0, 300), at: now() });
         }
         if (!deps.summaries) return;
         const source = summarySource(await journal.read(record.id));
@@ -265,6 +278,10 @@ export async function assembleSession(ctx: AssemblyContext, record: SessionRecor
   const stopUnits = async () => {
     for (const source of snapshot.sources)
       await Promise.resolve(source.stop()).catch((error) => log(record.id, { level: "error", message: "event source failed to stop", error: String(error) }));
+    // A plugin tool that keeps something running (the browser's and the computer's code runners) ends it here.
+    for (const tool of snapshot.tools as unknown as ReadonlyArray<{ name: string; close?: () => Promise<void> }>)
+      if (typeof tool.close === "function")
+        await tool.close().catch((error) => log(record.id, { level: "error", message: `tool ${tool.name} failed to close`, error: String(error) }));
   };
   try {
     await actor.open();
@@ -279,5 +296,5 @@ export async function assembleSession(ctx: AssemblyContext, record: SessionRecor
     throw error;
   }
   bridge.actor = actor;
-  return { actor, agent, journal, profile, stopUnits, approvals, workspaceId: workspace.workspaceId, filesDir: workspace.filesDir, waits };
+  return { actor, agent, journal, profile, stopUnits, approvals, yolo, workspaceId: workspace.workspaceId, filesDir: workspace.filesDir, waits };
 }

@@ -1,5 +1,29 @@
+import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
+import { dirname } from "node:path";
 import type { SignalSink } from "@vesper/contracts";
-import type { Provider } from "./types.ts";
+import type { MailWatchOptions, Provider } from "./types.ts";
+
+/**
+ * A watch position kept in a file, so a restart continues where the last run stopped (mail that came while the box was down still
+ * wakes the bot). No file: the watch starts from now, as before.
+ */
+export function cursorIn(file: string | undefined): MailWatchOptions {
+  if (!file) return {};
+  let after: string | undefined;
+  try {
+    after = (JSON.parse(readFileSync(file, "utf8")) as { after?: unknown }).after as string | undefined;
+  } catch {}
+  return {
+    ...(typeof after === "string" ? { after } : {}),
+    onCursor(cursor) {
+      if (cursor === after) return;
+      after = cursor;
+      mkdirSync(dirname(file), { recursive: true });
+      writeFileSync(`${file}.tmp`, `${JSON.stringify({ after: cursor })}\n`);
+      renameSync(`${file}.tmp`, file);
+    },
+  };
+}
 
 export interface EventSource {
   name: string;
@@ -22,6 +46,8 @@ export interface WatchOptions {
   /** Where signals go. `self` is the session that owns the plugin instance. */
   target?: string;
   onError?: (error: unknown) => void;
+  /** Where the mail watch keeps its position (the plugin's data directory). Without it, mail during a restart is not reported. */
+  cursorFile?: string;
 }
 
 /**
@@ -46,7 +72,10 @@ export function createWatchSources(options: WatchOptions): EventSource[] {
     sources.push({
       name: `${options.plugin}-mail`,
       start() {
-        stop ??= reader.watch((mail) => send(`mail-${mail.id}`, `New mail ${mail.id} from ${clean(mail.from, 120)}: ${clean(mail.subject, 200)}`));
+        stop ??= reader.watch(
+          (mail) => send(`mail-${mail.id}`, `New mail ${mail.id} from ${clean(mail.from, 120)}: ${clean(mail.subject, 200)}`),
+          cursorIn(options.cursorFile),
+        );
       },
       stop() {
         stop?.();

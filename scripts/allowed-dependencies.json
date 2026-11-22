@@ -81,7 +81,18 @@
       "builtins": true
     },
     "app": {
-      "dependencies": ["contracts", "gateway", "model-registry", "plugin-host", "profiles", "secrets", "session-runtime", "session-store", "workspace-client"],
+      "dependencies": [
+        "connectors",
+        "contracts",
+        "gateway",
+        "model-registry",
+        "plugin-host",
+        "profiles",
+        "secrets",
+        "session-runtime",
+        "session-store",
+        "workspace-client"
+      ],
       "externals": [],
       "builtins": true
     }
@@ -92,7 +103,16 @@
     "builtins": true,
     "overrides": {
       "handoff": {
-        "externals": ["step-by-step-handoff-mcp"]
+        "externals": ["sakura-agent-tools"]
+      },
+      "browser": {
+        "externals": ["sakura-agent-tools"]
+      },
+      "computer": {
+        "externals": ["sakura-agent-tools"]
+      },
+      "mail-gmail": {
+        "externals": ["imapflow", "nodemailer", "mailparser"]
       }
     }
   }
