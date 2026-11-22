@@ -1,4 +1,4 @@
-# @vesper/plugin-host
+# @standin/plugin-host
 
 Loads plugins (docs/08): manifest, catalogue, install, the one `PluginContext`. It knows no session.
 

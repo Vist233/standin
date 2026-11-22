@@ -19,7 +19,7 @@ import {
   type WorkspaceInfo,
   type WorkspaceSpec,
   type WorkspaceState,
-} from "@vesper/contracts";
+} from "@standin/contracts";
 
 export interface FakeWorkspaceHost extends WorkspaceHost {
   /** Puts a workspace in the `stopped` state (as after a daemon restart); `ensure` wakes it. */

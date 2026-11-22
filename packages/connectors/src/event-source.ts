@@ -1,6 +1,6 @@
 import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
-import type { SignalSink } from "@vesper/contracts";
+import type { SignalSink } from "@standin/contracts";
 import type { MailWatchOptions, Provider } from "./types.ts";
 
 /**

@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { isOgbError, type ErrorKind } from "@vesper/contracts";
+import { isOgbError, type ErrorKind } from "@standin/contracts";
 
 /** A failure the client caused or can fix, with the status that says so. */
 export class HttpFailure extends Error {

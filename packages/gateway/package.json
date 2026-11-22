@@ -1,5 +1,5 @@
 {
-  "name": "@vesper/gateway",
+  "name": "@standin/gateway",
   "version": "0.0.1",
   "private": true,
   "type": "module",
@@ -10,9 +10,9 @@
     "./testing": "./src/testing/index.ts"
   },
   "dependencies": {
-    "@vesper/contracts": "*",
-    "@vesper/event-journal": "*",
-    "@vesper/session-runtime": "*",
-    "@vesper/workspace-client": "*"
+    "@standin/contracts": "*",
+    "@standin/event-journal": "*",
+    "@standin/session-runtime": "*",
+    "@standin/workspace-client": "*"
   }
 }

@@ -3,7 +3,7 @@
 import { mkdtempSync, readFileSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { isOgbError } from "@vesper/contracts";
+import { isOgbError } from "@standin/contracts";
 import { afterEach, describe, expect, it } from "vitest";
 import { createTokenKeeper, openGraphMailbox, startDeviceLogin } from "../src/index.ts";
 import { createFakeGraph, type FakeGraph, providerContract } from "../src/testing/index.ts";

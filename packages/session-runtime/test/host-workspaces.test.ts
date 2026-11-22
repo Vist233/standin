@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { isOgbError } from "@vesper/contracts";
-import { createSocketRig } from "@vesper/workspace-client/testing";
+import { isOgbError } from "@standin/contracts";
+import { createSocketRig } from "@standin/workspace-client/testing";
 import { afterEach, describe, expect, it } from "vitest";
 import { createHostWorkspaces, workspaceIdFor } from "../src/index.ts";
 import { createRig, lastUserText } from "../src/testing/index.ts";

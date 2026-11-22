@@ -83,5 +83,5 @@ export function questionMarker(item) {
 
 /** The tab title: the name, with how many things wait for the person in front of it. */
 export function titleBadge(/** @type {number} */ count) {
-  return Number.isInteger(count) && count > 0 ? `(${count}) Vesper` : "Vesper";
+  return Number.isInteger(count) && count > 0 ? `(${count}) StandIn` : "StandIn";
 }

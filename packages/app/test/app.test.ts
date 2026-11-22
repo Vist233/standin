@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSyn
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { createFakeMatrix, createFakeTempMail } from "@vesper/connectors/testing";
+import { createFakeMatrix, createFakeTempMail } from "@standin/connectors/testing";
 import { createApp } from "../src/app.ts";
 import { harness, type Harness, KEY, repoRoot } from "./helpers.ts";
 
@@ -196,7 +196,7 @@ describe("stopping and starting again", () => {
       env: { OGB_DATA_DIR: first.dataDir, OGB_HOST: "127.0.0.1", OGB_PORT: "0", OGB_APP_ROOT: repoRoot, COMMANDCODE_API_KEY: KEY },
       write: () => {},
       deps: {
-        workspaceHost: { ...(await import("@vesper/workspace-client/testing")).createFakeWorkspaceHost({ root: join(first.dataDir, "ws") }), close: () => {} },
+        workspaceHost: { ...(await import("@standin/workspace-client/testing")).createFakeWorkspaceHost({ root: join(first.dataDir, "ws") }), close: () => {} },
         createClient: (await import("./helpers.ts")).pongModel().create,
       },
     });

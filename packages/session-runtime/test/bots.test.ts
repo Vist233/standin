@@ -1,8 +1,8 @@
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { Channel, Outgoing } from "@vesper/contracts";
-import { createFileSessionStore } from "@vesper/session-store";
+import type { Channel, Outgoing } from "@standin/contracts";
+import { createFileSessionStore } from "@standin/session-store";
 import { afterEach, describe, expect, it } from "vitest";
 import { editPerson, PERSON_MAX } from "../src/person.ts";
 import { createScheduler, parseWhen, type ScheduledJob } from "../src/scheduler.ts";

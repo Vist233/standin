@@ -1,6 +1,6 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import type { PluginContext } from "@vesper/contracts";
+import type { PluginContext } from "@standin/contracts";
 
 export interface FixturePluginSpec {
   name: string;

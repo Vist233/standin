@@ -1,5 +1,5 @@
-import { OgbError } from "@vesper/contracts";
-import { isSecretReference } from "@vesper/secrets";
+import { OgbError } from "@standin/contracts";
+import { isSecretReference } from "@standin/secrets";
 
 const COMPAT_PRESETS = ["deepseek", "moonshot", "openai"] as const;
 export type CompatPresetName = (typeof COMPAT_PRESETS)[number];

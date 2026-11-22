@@ -19,8 +19,8 @@ import {
   type WorkspaceInfo,
   type WorkspaceMethod,
   type WorkspaceSpec,
-} from "@vesper/contracts";
-import type { JsonValue } from "@vesper/contracts";
+} from "@standin/contracts";
+import type { JsonValue } from "@standin/contracts";
 
 export interface WorkspaceClientOptions {
   socketPath: string;

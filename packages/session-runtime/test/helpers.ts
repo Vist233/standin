@@ -1,8 +1,8 @@
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { SessionEvent } from "@vesper/contracts";
-import { writeFixturePlugin } from "@vesper/plugin-host/testing";
+import type { SessionEvent } from "@standin/contracts";
+import { writeFixturePlugin } from "@standin/plugin-host/testing";
 
 /** A plugin with one tool, `gated`, that stays inside its call until the test opens the gate. */
 export function gatedPlugin(root = mkdtempSync(join(tmpdir(), "ogb-gated-")), name = "demo", approval?: Record<string, string>) {

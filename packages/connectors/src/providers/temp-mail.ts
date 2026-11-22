@@ -1,4 +1,4 @@
-import { OgbError } from "@vesper/contracts";
+import { OgbError } from "@standin/contracts";
 import type { MailMessage, MailQuery, MailSummary, Provider, Provisioner, Stop } from "../types.ts";
 
 /**

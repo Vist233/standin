@@ -1,7 +1,7 @@
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { TEMP_MAIL_VARIABLES, tempMailSettings } from "@vesper/connectors";
-import { OgbError } from "@vesper/contracts";
+import { TEMP_MAIL_VARIABLES, tempMailSettings } from "@standin/connectors";
+import { OgbError } from "@standin/contracts";
 
 /** The name of the variable that carries the model key. The key is read from the environment only and never written anywhere. */
 export const MODEL_KEY_VARIABLE = "COMMANDCODE_API_KEY";

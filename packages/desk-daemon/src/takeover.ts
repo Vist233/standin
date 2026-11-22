@@ -1,7 +1,7 @@
 import { randomBytes } from "node:crypto";
 import { connect } from "node:net";
 import { join } from "node:path";
-import type { PluginLogger, StreamMode, TakeoverTicket } from "@vesper/contracts";
+import type { PluginLogger, StreamMode, TakeoverTicket } from "@standin/contracts";
 import type { DaemonConfig } from "./config.ts";
 import { SupervisedProcess } from "./supervisor.ts";
 import { type Bridge, startBridge, tokensEqual } from "./ws-bridge.ts";

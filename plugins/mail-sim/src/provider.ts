@@ -1,6 +1,6 @@
 import { join } from "node:path";
-import { type Account, type Provider, ProviderRegistry } from "@vesper/connectors";
-import type { PluginContext } from "@vesper/contracts";
+import { type Account, type Provider, ProviderRegistry } from "@standin/connectors";
+import type { PluginContext } from "@standin/contracts";
 import { createFileMailbox } from "./mailbox.ts";
 
 /** The seam in use: the sim registers itself as the provider kind `sim`; a real provider plugin registers `imap-smtp` the same way. */

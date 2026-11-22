@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { lstatSync, readdirSync, readFileSync, realpathSync } from "node:fs";
 import { join, relative, sep } from "node:path";
-import { OgbError } from "@vesper/contracts";
+import { OgbError } from "@standin/contracts";
 
 const SKIPPED = new Set([".git", "node_modules"]);
 

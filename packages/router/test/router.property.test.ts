@@ -1,4 +1,4 @@
-import type { SignalSource } from "@vesper/contracts";
+import type { SignalSource } from "@standin/contracts";
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import { priorityOf } from "../src/index.ts";

@@ -1,4 +1,4 @@
-import type { Channel, ChannelInbox, Outgoing, SignalDraft } from "@vesper/contracts";
+import type { Channel, ChannelInbox, Outgoing, SignalDraft } from "@standin/contracts";
 import { cursorIn } from "../event-source.ts";
 import type { ChatEvent, ChatSource } from "./types.ts";
 

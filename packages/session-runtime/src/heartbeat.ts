@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { OgbError } from "@vesper/contracts";
+import { OgbError } from "@standin/contracts";
 
 /**
  * A bot's heartbeat (docs/26 3.3): a repeating wake-up that looks at a checklist and stays quiet when nothing needs the person.

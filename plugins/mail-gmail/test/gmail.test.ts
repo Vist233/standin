@@ -3,8 +3,8 @@
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { providerContract } from "@vesper/connectors/testing";
-import { isOgbError, type PluginContext } from "@vesper/contracts";
+import { providerContract } from "@standin/connectors/testing";
+import { isOgbError, type PluginContext } from "@standin/contracts";
 import { afterEach, describe, expect, it } from "vitest";
 import { createGmail, GMAIL_VARIABLES, serversOf } from "../src/gmail.ts";
 import { createImapProvider } from "../src/provider.ts";

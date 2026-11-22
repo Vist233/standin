@@ -1,12 +1,12 @@
 {
-  "name": "@vesper/plugin-mail-sim",
+  "name": "@standin/plugin-mail-sim",
   "version": "0.0.1",
   "private": true,
   "type": "module",
   "description": "A simulated mailbox and calendar in files: the test double and demo of every mail provider plugin.",
   "license": "MIT",
   "dependencies": {
-    "@vesper/connectors": "*",
-    "@vesper/contracts": "*"
+    "@standin/connectors": "*",
+    "@standin/contracts": "*"
   }
 }

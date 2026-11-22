@@ -1,7 +1,7 @@
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { isOgbError } from "@vesper/contracts";
+import { isOgbError } from "@standin/contracts";
 import { afterEach, describe, expect, it } from "vitest";
 import { createWorkspaceClient } from "../src/index.ts";
 import { createFakeWorkspaceHost, createSocketRig, type HostHarness, workspaceHostContract } from "../src/testing/index.ts";

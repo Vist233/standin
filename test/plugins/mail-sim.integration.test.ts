@@ -4,8 +4,8 @@
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { installFromMarketplace, loadPluginDirectory, makeWritable, parseMarketplace } from "@vesper/plugin-host";
-import { createRig, type Rig, userTexts as sharedUserTexts, lastMessage } from "@vesper/session-runtime/testing";
+import { installFromMarketplace, loadPluginDirectory, makeWritable, parseMarketplace } from "@standin/plugin-host";
+import { createRig, type Rig, userTexts as sharedUserTexts, lastMessage } from "@standin/session-runtime/testing";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { gatedPlugin, installGate } from "../../packages/session-runtime/test/helpers.ts";
 

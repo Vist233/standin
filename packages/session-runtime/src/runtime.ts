@@ -1,9 +1,9 @@
 import { randomBytes } from "node:crypto";
 import { rm } from "node:fs/promises";
 import { join } from "node:path";
-import { type Channel, type JsonValue, OgbError, type Outgoing, type SessionEvent, type SignalDraft } from "@vesper/contracts";
-import { resolveSession } from "@vesper/profiles";
-import type { SessionRecord } from "@vesper/session-store";
+import { type Channel, type JsonValue, OgbError, type Outgoing, type SessionEvent, type SignalDraft } from "@standin/contracts";
+import { resolveSession } from "@standin/profiles";
+import type { SessionRecord } from "@standin/session-store";
 import { attachmentRefs, withAttachmentLine } from "./attachments.ts";
 import { json } from "./events.ts";
 import { type AssemblyContext, assembleSession, type OpenSession } from "./session-assembly.ts";

@@ -1,7 +1,7 @@
 // Browser tests of the page (usable plan section 4 and revision 1). Run them in the box image, where Playwright's Chromium
 // is installed (on a laptop OGB_CHROME=1 uses the installed Google Chrome). Run with `npm run test:web`. The gateway is real; the runtime, the workspace host and the desktop
 // (an RFB server behind a real WebSocket) are fakes, so the take-over path is exercised end to end except for the daemon.
-import { JOURNAL_FIXTURES } from "@vesper/contracts/testing";
+import { JOURNAL_FIXTURES } from "@standin/contracts/testing";
 import { type Browser, type BrowserContext, chromium, type Page } from "playwright-core";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { type Harness, startHarness } from "./harness.ts";

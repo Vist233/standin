@@ -1,7 +1,7 @@
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { createWorkspaceClient } from "@vesper/workspace-client";
-import { type HostHarness, workspaceHostContract } from "@vesper/workspace-client/testing";
+import { createWorkspaceClient } from "@standin/workspace-client";
+import { type HostHarness, workspaceHostContract } from "@standin/workspace-client/testing";
 import { DeskHost } from "../src/host.ts";
 import { serveWorkspaceHost } from "../src/server.ts";
 import { stubConfig } from "../src/testing/index.ts";

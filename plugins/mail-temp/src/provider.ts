@@ -1,6 +1,6 @@
 import { join } from "node:path";
-import { openTempMailAccount, type Provider, TEMP_MAIL_VARIABLES, tempMailSettings } from "@vesper/connectors";
-import { isOgbError, OgbError, type PluginContext } from "@vesper/contracts";
+import { openTempMailAccount, type Provider, TEMP_MAIL_VARIABLES, tempMailSettings } from "@standin/connectors";
+import { isOgbError, OgbError, type PluginContext } from "@standin/contracts";
 
 const open = new Map<string, Promise<Provider>>();
 

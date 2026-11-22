@@ -8,16 +8,16 @@ import {
   openSatori,
   openTempMailAccount,
   TEMP_MAIL_VARIABLES,
-} from "@vesper/connectors";
-import { type Channel, OgbError, type SecretResolver, type StartupLine, type WorkspaceHost } from "@vesper/contracts";
-import { createGateway, type Gateway } from "@vesper/gateway";
-import { createModelRegistry, type ModelRegistryOptions } from "@vesper/model-registry";
-import { createPluginHost } from "@vesper/plugin-host";
-import type { ProfileConfig } from "@vesper/profiles";
-import { createEnvironmentProvider, createSecretRegistry } from "@vesper/secrets";
-import { createHostWorkspaces, createSessionRuntime, type SessionRuntime } from "@vesper/session-runtime";
-import { createFileSessionStore } from "@vesper/session-store";
-import { createWorkspaceClient } from "@vesper/workspace-client";
+} from "@standin/connectors";
+import { type Channel, OgbError, type SecretResolver, type StartupLine, type WorkspaceHost } from "@standin/contracts";
+import { createGateway, type Gateway } from "@standin/gateway";
+import { createModelRegistry, type ModelRegistryOptions } from "@standin/model-registry";
+import { createPluginHost } from "@standin/plugin-host";
+import type { ProfileConfig } from "@standin/profiles";
+import { createEnvironmentProvider, createSecretRegistry } from "@standin/secrets";
+import { createHostWorkspaces, createSessionRuntime, type SessionRuntime } from "@standin/session-runtime";
+import { createFileSessionStore } from "@standin/session-store";
+import { createWorkspaceClient } from "@standin/workspace-client";
 import { checkBackends } from "./backends.ts";
 import {
   type ChatBridgeConfig,

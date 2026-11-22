@@ -1,6 +1,6 @@
 import { existsSync, rmSync } from "node:fs";
 import { join } from "node:path";
-import type { PluginLogger, ScreenSize } from "@vesper/contracts";
+import type { PluginLogger, ScreenSize } from "@standin/contracts";
 import type { DaemonConfig } from "./config.ts";
 import { SupervisedProcess } from "./supervisor.ts";
 

@@ -1,4 +1,4 @@
-import type { SafetyPlugin } from "@vesper/profiles";
+import type { SafetyPlugin } from "@standin/profiles";
 import { type LlmClient, type Plugin, redactionPlugin, reviewPlugin } from "sakura-agent";
 import { type ReviewPolicy, VESPER_REVIEW_POLICY } from "./review-policy.ts";
 

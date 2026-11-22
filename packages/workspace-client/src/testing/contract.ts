@@ -1,4 +1,4 @@
-import { DEFAULT_SCREEN, isOgbError, MAX_FILE_BYTES, MAX_INSERT_TEXT_CHARS, type WorkspaceHost } from "@vesper/contracts";
+import { DEFAULT_SCREEN, isOgbError, MAX_FILE_BYTES, MAX_INSERT_TEXT_CHARS, type WorkspaceHost } from "@standin/contracts";
 import { describe, expect, it } from "vitest";
 
 export interface HostHarness {

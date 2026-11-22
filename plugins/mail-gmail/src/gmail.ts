@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import type { MailReader, MailSender, Provider, Stop } from "@vesper/connectors";
-import { OgbError, type PluginContext } from "@vesper/contracts";
+import type { MailReader, MailSender, Provider, Stop } from "@standin/connectors";
+import { OgbError, type PluginContext } from "@standin/contracts";
 import { createImapProvider, type MailStore, type MailTransport } from "./provider.ts";
 
 /** The environment names; the password is a secret the app takes out of the environment at start. */

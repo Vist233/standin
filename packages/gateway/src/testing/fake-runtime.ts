@@ -1,6 +1,6 @@
-import { type EventDraft, OgbError, type SessionEvent } from "@vesper/contracts";
-import { createMemoryJournal, type MemoryJournal } from "@vesper/event-journal/testing";
-import type { SessionInfo, SessionStatus } from "@vesper/session-runtime";
+import { type EventDraft, OgbError, type SessionEvent } from "@standin/contracts";
+import { createMemoryJournal, type MemoryJournal } from "@standin/event-journal/testing";
+import type { SessionInfo, SessionStatus } from "@standin/session-runtime";
 import type { GatewayRuntime } from "../types.ts";
 
 export interface FakeRuntime extends GatewayRuntime {

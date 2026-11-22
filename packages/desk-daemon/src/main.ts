@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
-import type { PluginLogger } from "@vesper/contracts";
+import type { PluginLogger } from "@standin/contracts";
 import { defaultConfig, parseViewFilter } from "./config.ts";
 import { DeskHost } from "./host.ts";
 import { serveWorkspaceHost } from "./server.ts";

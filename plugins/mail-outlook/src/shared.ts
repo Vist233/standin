@@ -1,4 +1,4 @@
-import type { PluginContext } from "@vesper/contracts";
+import type { PluginContext } from "@standin/contracts";
 import { createOutlook } from "./outlook.ts";
 
 const made = new Map<string, ReturnType<typeof createOutlook>>();

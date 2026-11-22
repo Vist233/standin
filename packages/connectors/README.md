@@ -1,4 +1,4 @@
-# @vesper/connectors
+# @standin/connectors
 
 Mail and calendar for any provider (docs/08 section 4a, docs/09 T7). Plugins import this package (and contracts) and nothing else of ours.
 
@@ -6,5 +6,5 @@ Mail and calendar for any provider (docs/08 section 4a, docs/09 T7). Plugins imp
 - **`ProviderRegistry`:** a provider kind (`sim`, later `imap-smtp`, `caldav`, `microsoft-graph`) maps to a factory `(account, context) -> Provider`. The tools never name a provider.
 - **`createConnectorTools(provider)`:** only the parts a provider has become tools: a reader gives `mail_list` and `mail_read`, a sender `mail_send`, a calendar `calendar_list/read/create/update`. Sending, creating and changing events are `irreversible` (the plugin host turns that into the person's approval) and never replayed. A mail body or an event description reaches the model between markers that say it is from outside and not to be obeyed.
 - **`createWatchSources({ provider, plugin, sink })`:** turns "a mail or event arrived" into one signal each from the plugin's own source (`plugin:<name>`): a one-line notice with id, sender and subject (control characters removed), never the body. Signals leave one after the other in arrival order with stable ids (`mail-<id>`), so the router can drop a repeat.
-- **`@vesper/connectors/testing`:** `providerContract(name, create)`, the suite every provider must pass (list order and filters, unread flags, read, `not_found`, watch only for new items and never twice, stop, send to the sent folder from the account's address, the calendar operations); `createMemoryProvider`, the reference implementation; `memoryHarness`.
+- **`@standin/connectors/testing`:** `providerContract(name, create)`, the suite every provider must pass (list order and filters, unread flags, read, `not_found`, watch only for new items and never twice, stop, send to the sent folder from the account's address, the calendar operations); `createMemoryProvider`, the reference implementation; `memoryHarness`.
 - **Hides:** the protocol of any provider. **Never knows:** the router, sessions, agents, the framework's loop (only its `Tool` type).

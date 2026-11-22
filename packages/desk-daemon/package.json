@@ -1,5 +1,5 @@
 {
-  "name": "@vesper/desk-daemon",
+  "name": "@standin/desk-daemon",
   "version": "0.0.1",
   "private": true,
   "type": "module",
@@ -13,9 +13,9 @@
     "./testing": "./src/testing/index.ts"
   },
   "dependencies": {
-    "@vesper/contracts": "*"
+    "@standin/contracts": "*"
   },
   "devDependencies": {
-    "@vesper/workspace-client": "*"
+    "@standin/workspace-client": "*"
   }
 }

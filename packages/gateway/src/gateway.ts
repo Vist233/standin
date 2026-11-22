@@ -1,6 +1,6 @@
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import type { Socket } from "node:net";
-import { MAX_FILE_BYTES, OgbError } from "@vesper/contracts";
+import { MAX_FILE_BYTES, OgbError } from "@standin/contracts";
 import { Api } from "./api.ts";
 import { Guard, isLoopbackAddress } from "./guard.ts";
 import { describeFailure, readRawBody, HttpFailure, sendJson } from "./http.ts";

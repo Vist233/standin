@@ -1,4 +1,4 @@
-import type { SessionEvent } from "@vesper/contracts";
+import type { SessionEvent } from "@standin/contracts";
 import { describe, expect, it } from "vitest";
 import { createSessionSearchTool, searchEvents } from "../src/session-search.ts";
 

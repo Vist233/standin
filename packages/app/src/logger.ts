@@ -1,4 +1,4 @@
-import { workspaceIdFor } from "@vesper/session-runtime";
+import { workspaceIdFor } from "@standin/session-runtime";
 
 export type Level = "debug" | "info" | "warn" | "error";
 const ORDER: Record<Level, number> = { debug: 0, info: 1, warn: 2, error: 3 };

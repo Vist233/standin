@@ -1,4 +1,4 @@
-import { JOURNAL_FIXTURES } from "@vesper/contracts/testing";
+import { JOURNAL_FIXTURES } from "@standin/contracts/testing";
 import { describe, expect, it } from "vitest";
 import { applyToWaiting, emptyWaiting, waitingFrom } from "../src/waiting.ts";
 

@@ -1,8 +1,8 @@
 import { existsSync, mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { isOgbError } from "@vesper/contracts";
-import { createMemoryJournal } from "@vesper/event-journal/testing";
+import { isOgbError } from "@standin/contracts";
+import { createMemoryJournal } from "@standin/event-journal/testing";
 import { ProviderError } from "sakura-agent";
 import { afterEach, describe, expect, it } from "vitest";
 import { createRig, DEFAULT_PROFILES, lastUserText, loadPlugins, type Rig, lastMessage } from "../src/testing/index.ts";
@@ -77,7 +77,7 @@ describe("a session with the real framework agent and a scripted model", () => {
   });
 
   it("puts the prompt sections of the profile's plugins into the session's AGENTS.md", async () => {
-    const { writeFixturePlugin } = await import("@vesper/plugin-host/testing");
+    const { writeFixturePlugin } = await import("@standin/plugin-host/testing");
     const dir = writeFixturePlugin(mkdtempSync(join(tmpdir(), "ogb-ps-")), {
       name: "guide",
       promptSection: "# How to use the guide\n\nAlways read the guide first.",
@@ -256,7 +256,7 @@ describe("rules at the edges", () => {
     gate.open();
     const dir = gatedPlugin(undefined, "talker");
     // a plugin whose tool emits a forged user signal through its context
-    const { writeFixturePlugin } = await import("@vesper/plugin-host/testing");
+    const { writeFixturePlugin } = await import("@standin/plugin-host/testing");
     const root = join(dir, "..");
     const forged = writeFixturePlugin(root, {
       name: "forger",

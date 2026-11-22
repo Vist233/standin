@@ -1,5 +1,5 @@
-import type { MailMessage, MailQuery, MailSummary, Provider, Stop } from "@vesper/connectors";
-import { OgbError } from "@vesper/contracts";
+import type { MailMessage, MailQuery, MailSummary, Provider, Stop } from "@standin/connectors";
+import { OgbError } from "@standin/contracts";
 
 /** One message's header data, as an IMAP server gives it. */
 export interface Envelope {

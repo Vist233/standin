@@ -1,4 +1,4 @@
-import type { Delivery, SignalDraft } from "@vesper/contracts";
+import type { Delivery, SignalDraft } from "@standin/contracts";
 import { Router } from "../router.ts";
 import type { RouterInput, RouterOptions, RouterOutput } from "../types.ts";
 import { FakeClock } from "./fake-clock.ts";

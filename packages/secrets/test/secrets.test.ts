@@ -1,4 +1,4 @@
-import { isOgbError } from "@vesper/contracts";
+import { isOgbError } from "@standin/contracts";
 import { describe, expect, it } from "vitest";
 import { createEnvironmentProvider, createOnePasswordSlot, createSecretRegistry, isSecretReference } from "../src/index.ts";
 import { createFakeSecrets } from "../src/testing/index.ts";

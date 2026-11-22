@@ -1,4 +1,4 @@
-import type { EventDraft, SessionEvent } from "@vesper/contracts";
+import type { EventDraft, SessionEvent } from "@standin/contracts";
 import { interruptedResult } from "./events.ts";
 import { waitingFrom } from "./waiting.ts";
 

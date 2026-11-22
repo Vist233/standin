@@ -1,7 +1,7 @@
 import { mkdir, open, readFile, truncate } from "node:fs/promises";
 import type { FileHandle } from "node:fs/promises";
 import { join } from "node:path";
-import { EVENT_SCHEMA_VERSION, type EventDraft, OgbError, type SessionEvent } from "@vesper/contracts";
+import { EVENT_SCHEMA_VERSION, type EventDraft, OgbError, type SessionEvent } from "@standin/contracts";
 import type { EventJournal } from "./journal.ts";
 import { assertDraft, assertSessionId, formatEvent, parseLog } from "./log-format.ts";
 import { followSession, Listeners } from "./subscription.ts";

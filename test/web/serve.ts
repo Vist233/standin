@@ -1,6 +1,6 @@
 // Run by hand to look at the page: OGB_MANUAL=1 PORT=8099 npx vitest run --config vitest.web.config.ts test/web/manual.e2e.ts
 // (the fake journal imports vitest, so it only loads inside vitest)
-import { JOURNAL_FIXTURES } from "@vesper/contracts/testing";
+import { JOURNAL_FIXTURES } from "@standin/contracts/testing";
 import { startHarness } from "./harness.ts";
 
 export async function serveDemo(port: number) {

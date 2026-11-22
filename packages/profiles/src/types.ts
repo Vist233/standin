@@ -1,4 +1,4 @@
-import type { JsonValue } from "@vesper/contracts";
+import type { JsonValue } from "@standin/contracts";
 
 /** The review and redaction plugins of the framework. Every session has them unless the config file on the box says otherwise. */
 export const SAFETY_FLOOR = ["review", "redaction"] as const;

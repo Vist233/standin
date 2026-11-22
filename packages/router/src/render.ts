@@ -1,4 +1,4 @@
-import type { Signal } from "@vesper/contracts";
+import type { Signal } from "@standin/contracts";
 
 /**
  * The text a signal becomes when it reaches the model. The user's own words go through unchanged. Everything else

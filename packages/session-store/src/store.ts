@@ -1,7 +1,7 @@
 import { randomBytes } from "node:crypto";
 import { mkdir, readdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { isJsonObject, type JsonValue, OgbError } from "@vesper/contracts";
+import { isJsonObject, type JsonValue, OgbError } from "@standin/contracts";
 
 export type SessionStatus = "active" | "archived";
 

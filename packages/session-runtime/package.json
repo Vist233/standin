@@ -1,5 +1,5 @@
 {
-  "name": "@vesper/session-runtime",
+  "name": "@standin/session-runtime",
   "version": "0.0.1",
   "private": true,
   "type": "module",
@@ -10,16 +10,16 @@
     "./testing": "./src/testing/index.ts"
   },
   "dependencies": {
-    "@vesper/agents-md": "*",
-    "@vesper/contracts": "*",
-    "@vesper/event-journal": "*",
-    "@vesper/model-registry": "*",
-    "@vesper/plugin-host": "*",
-    "@vesper/profiles": "*",
-    "@vesper/router": "*",
-    "@vesper/secrets": "*",
-    "@vesper/session-store": "*",
-    "@vesper/workspace-client": "*",
+    "@standin/agents-md": "*",
+    "@standin/contracts": "*",
+    "@standin/event-journal": "*",
+    "@standin/model-registry": "*",
+    "@standin/plugin-host": "*",
+    "@standin/profiles": "*",
+    "@standin/router": "*",
+    "@standin/secrets": "*",
+    "@standin/session-store": "*",
+    "@standin/workspace-client": "*",
     "sakura-agent": "0.2.3"
   }
 }

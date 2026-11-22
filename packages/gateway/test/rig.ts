@@ -1,9 +1,9 @@
 import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { checkInsertText, type OgbError, type TakeoverTicket, type WorkspaceHost } from "@vesper/contracts";
-import { createFakeWorkspaceHost, type FakeWorkspaceHost } from "@vesper/workspace-client/testing";
-import { workspaceIdFor } from "@vesper/session-runtime";
+import { checkInsertText, type OgbError, type TakeoverTicket, type WorkspaceHost } from "@standin/contracts";
+import { createFakeWorkspaceHost, type FakeWorkspaceHost } from "@standin/workspace-client/testing";
+import { workspaceIdFor } from "@standin/session-runtime";
 import { createGateway, type Gateway, type GatewayOptions } from "../src/index.ts";
 import { createFakeRuntime, type EchoServer, type FakeRuntime, type Probe, startEchoUpgradeServer, startProbe } from "../src/testing/index.ts";
 

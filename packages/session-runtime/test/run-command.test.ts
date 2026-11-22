@@ -1,10 +1,10 @@
 import { mkdtempSync, realpathSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { isOgbError } from "@vesper/contracts";
+import { isOgbError } from "@standin/contracts";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createHostWorkspaces, runInWorkspace, spawnInWorkspace, workspaceEnvironment } from "../src/index.ts";
-import { createFakeWorkspaceHost } from "@vesper/workspace-client/testing";
+import { createFakeWorkspaceHost } from "@standin/workspace-client/testing";
 
 const dirs: string[] = [];
 const node = process.execPath;

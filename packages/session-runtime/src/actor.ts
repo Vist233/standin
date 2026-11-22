@@ -1,6 +1,6 @@
-import { type Delivery, type EventDraft, type JsonValue, type MessageAttachment, OgbError, type SignalDraft } from "@vesper/contracts";
-import type { EventJournal } from "@vesper/event-journal";
-import { Router, type RouterInput, type RouterOptions, type RouterOutput } from "@vesper/router";
+import { type Delivery, type EventDraft, type JsonValue, type MessageAttachment, OgbError, type SignalDraft } from "@standin/contracts";
+import type { EventJournal } from "@standin/event-journal";
+import { Router, type RouterInput, type RouterOptions, type RouterOutput } from "@standin/router";
 import type { Agent, Event } from "sakura-agent";
 import { describeRunError, errorKindOf, JournalMapper, pauseOf, runReasonOf, textOf, retryableRun } from "./events.ts";
 import { repairAfterRestart } from "./repair.ts";

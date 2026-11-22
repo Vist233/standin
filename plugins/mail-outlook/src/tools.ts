@@ -1,5 +1,5 @@
-import { createConnectorTools } from "@vesper/connectors";
-import type { PluginContext } from "@vesper/contracts";
+import { createConnectorTools } from "@standin/connectors";
+import type { PluginContext } from "@standin/contracts";
 import type { Tool } from "sakura-agent";
 import { outlookFor } from "./shared.ts";
 

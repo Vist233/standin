@@ -1,5 +1,5 @@
 import { join } from "node:path";
-import { JOURNAL_FIXTURES } from "@vesper/contracts/testing";
+import { JOURNAL_FIXTURES } from "@standin/contracts/testing";
 import { afterEach, describe, expect, it } from "vitest";
 import { attachmentRefs, withAttachmentLine } from "../src/attachments.ts";
 import { waitingFrom } from "../src/waiting.ts";

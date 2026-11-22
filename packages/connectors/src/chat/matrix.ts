@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { OgbError } from "@vesper/contracts";
+import { OgbError } from "@standin/contracts";
 import type { ChatEvent, ChatSource } from "./types.ts";
 
 /**

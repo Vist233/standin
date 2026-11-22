@@ -1,4 +1,4 @@
-import type { SessionEvent } from "@vesper/contracts";
+import type { SessionEvent } from "@standin/contracts";
 import type { LlmClient } from "sakura-agent";
 import { textOf } from "./events.ts";
 

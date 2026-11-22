@@ -1,7 +1,7 @@
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
-import { OgbError } from "@vesper/contracts";
+import { OgbError } from "@standin/contracts";
 
 /**
  * Webhooks (docs/26 3.4): a bot's named doors for outside services (GitHub, a calendar, IFTTT). Each has its own token, kept only as a

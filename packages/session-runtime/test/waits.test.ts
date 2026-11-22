@@ -1,4 +1,4 @@
-import type { SessionEvent } from "@vesper/contracts";
+import type { SessionEvent } from "@standin/contracts";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { handbackTimedOut, questionTimedOut } from "../src/takeover.ts";
 import { createRig, type Rig } from "../src/testing/index.ts";

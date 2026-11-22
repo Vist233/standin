@@ -1,4 +1,4 @@
-import type { Decision, Delivery, SignalDraft } from "@vesper/contracts";
+import type { Decision, Delivery, SignalDraft } from "@standin/contracts";
 
 /**
  * Everything the router can be told. Every input carries `at` (milliseconds on the caller's clock), so the router

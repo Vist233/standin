@@ -1,6 +1,6 @@
 import { join } from "node:path";
-import { createWatchSources, type EventSource } from "@vesper/connectors";
-import type { PluginContext } from "@vesper/contracts";
+import { createWatchSources, type EventSource } from "@standin/connectors";
+import type { PluginContext } from "@standin/contracts";
 import { providerFor } from "./provider.ts";
 
 export async function createSources(ctx: PluginContext): Promise<EventSource[]> {

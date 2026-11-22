@@ -1,7 +1,7 @@
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { PluginLogger } from "@vesper/contracts";
+import type { PluginLogger } from "@standin/contracts";
 
 export const silentLog: PluginLogger = { info: () => {}, warn: () => {}, error: () => {} };
 

@@ -1,6 +1,6 @@
 import { chmodSync, cpSync, existsSync, lstatSync, mkdirSync, readdirSync, realpathSync, rmSync } from "node:fs";
 import { dirname, join, resolve, sep } from "node:path";
-import { isJsonObject, OgbError } from "@vesper/contracts";
+import { isJsonObject, OgbError } from "@standin/contracts";
 import { hashPluginDirectory, listPluginFiles } from "./files.ts";
 import { isInsidePath } from "./manifest.ts";
 import { loadPluginDirectory, type LoadedPlugin } from "./loader.ts";

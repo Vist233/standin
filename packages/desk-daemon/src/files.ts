@@ -2,7 +2,7 @@ import { randomBytes } from "node:crypto";
 import { constants } from "node:fs";
 import { link, lstat, mkdir, open, readdir, unlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { checkFileBytes, type FileEntry, MAX_FILE_BYTES, numberedName, OgbError, type PluginLogger, sanitizeFileName } from "@vesper/contracts";
+import { checkFileBytes, type FileEntry, MAX_FILE_BYTES, numberedName, OgbError, type PluginLogger, sanitizeFileName } from "@standin/contracts";
 
 const MAX_SUFFIX = 1000;
 

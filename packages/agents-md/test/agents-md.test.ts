@@ -1,4 +1,4 @@
-import { parseProfileConfig, resolveSession } from "@vesper/profiles";
+import { parseProfileConfig, resolveSession } from "@standin/profiles";
 import { describe, expect, it } from "vitest";
 import { type AgentsMdInput, headingsOf, renderAgentsMd, SECTIONS } from "../src/index.ts";
 import { sampleAgentsMdInput } from "../src/testing/index.ts";

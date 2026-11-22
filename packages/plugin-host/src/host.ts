@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { pathToFileURL } from "node:url";
-import { CORE_TOOL_NAMES, OgbError, type PluginContext } from "@vesper/contracts";
+import { CORE_TOOL_NAMES, OgbError, type PluginContext } from "@standin/contracts";
 import type { Tool } from "sakura-agent";
 import { resolveInside } from "./files.ts";
 import type { LoadedPlugin, McpServerEntry, SkillInfo } from "./loader.ts";

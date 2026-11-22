@@ -3,7 +3,7 @@
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { SignalDraft } from "@vesper/contracts";
+import type { SignalDraft } from "@standin/contracts";
 import { afterEach, describe, expect, it } from "vitest";
 import { createChatBridge, openMatrix, openSatori, satoriText } from "../src/index.ts";
 import { chatSourceContract, createFakeMatrix, createFakeSatori } from "../src/testing/index.ts";

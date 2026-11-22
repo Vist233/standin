@@ -1,8 +1,8 @@
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { createWorkspaceClient } from "@vesper/workspace-client";
+import { createWorkspaceClient } from "@standin/workspace-client";
 import { afterEach, describe, expect, it } from "vitest";
-import { MAX_FILE_BYTES } from "@vesper/contracts";
+import { MAX_FILE_BYTES } from "@standin/contracts";
 import { DeskHost } from "../src/host.ts";
 import { serveWorkspaceHost } from "../src/server.ts";
 import { stubConfig } from "../src/testing/index.ts";

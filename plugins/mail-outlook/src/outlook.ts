@@ -10,8 +10,8 @@ import {
   startDeviceLogin,
   type Stop,
   type TokenKeeper,
-} from "@vesper/connectors";
-import { OgbError, type PluginContext } from "@vesper/contracts";
+} from "@standin/connectors";
+import { OgbError, type PluginContext } from "@standin/contracts";
 
 export const SCOPES = ["offline_access", "User.Read", "Mail.ReadWrite", "Mail.Send"];
 

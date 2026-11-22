@@ -1,7 +1,7 @@
 import { mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { providerContract } from "@vesper/connectors/testing";
+import { providerContract } from "@standin/connectors/testing";
 import { afterEach, describe, expect, it } from "vitest";
 import { createFileMailbox } from "../src/mailbox.ts";
 

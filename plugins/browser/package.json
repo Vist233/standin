@@ -1,11 +1,11 @@
 {
-  "name": "@vesper/plugin-browser",
+  "name": "@standin/plugin-browser",
   "version": "0.0.1",
   "private": true,
   "type": "module",
   "description": "The browser tool as a plugin: each agent works in its own tabs of the workspace's browser.",
   "license": "MIT",
   "dependencies": {
-    "@vesper/contracts": "*"
+    "@standin/contracts": "*"
   }
 }

@@ -1,6 +1,6 @@
 // Channels (contracts/channels.ts): the person's messages come in through any channel as their own; what the person should get (a message,
 // a question) goes out on every channel; a channel that fails never stops the bot. The page is the first channel.
-import type { Channel, ChannelInbox, Outgoing } from "@vesper/contracts";
+import type { Channel, ChannelInbox, Outgoing } from "@standin/contracts";
 import { afterEach, describe, expect, it } from "vitest";
 import { createRig, type Rig } from "../src/testing/index.ts";
 

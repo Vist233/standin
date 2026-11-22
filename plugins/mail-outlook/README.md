@@ -12,5 +12,5 @@ signs in with. Other bots that have the plugin are told it belongs to another bo
   on every use and the newest is written back), and `owner.json` names the bot. To move the account to another bot, delete both files.
 - **Tools:** `outlook_connect`, `outlook_list`, `outlook_read` (marks read), `outlook_send` (a draft, then send; ids are immutable). New mail is a
   signal (every 30 s).
-- **Tests:** the shared provider contract against stand-ins of Microsoft's sign-in and Graph (`@vesper/connectors/testing`); the device
+- **Tests:** the shared provider contract against stand-ins of Microsoft's sign-in and Graph (`@standin/connectors/testing`); the device
   code, declined sign-in, refresh with a replaced refresh token; one owner among two bots. A real account is tested by hand.

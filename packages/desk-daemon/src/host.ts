@@ -18,7 +18,7 @@ import {
   type WorkspaceHost,
   type WorkspaceInfo,
   type WorkspaceSpec,
-} from "@vesper/contracts";
+} from "@standin/contracts";
 import { type DaemonConfig, SLOT_COUNT } from "./config.ts";
 import { devtoolsCookies, SharedLogins } from "./shared-logins.ts";
 import { sweepStaleProcesses } from "./supervisor.ts";

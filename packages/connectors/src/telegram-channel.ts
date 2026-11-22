@@ -1,4 +1,4 @@
-import type { Channel, ChannelInbox } from "@vesper/contracts";
+import type { Channel, ChannelInbox } from "@standin/contracts";
 
 export interface TelegramChannelOptions {
   /** The bot's token (from @BotFather). A secret: it is never logged. */

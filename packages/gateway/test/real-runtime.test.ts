@@ -1,7 +1,7 @@
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createRig, lastUserText } from "@vesper/session-runtime/testing";
+import { createRig, lastUserText } from "@standin/session-runtime/testing";
 import { afterEach, describe, expect, it } from "vitest";
 import { createGateway } from "../src/index.ts";
 import { startProbe } from "../src/testing/index.ts";

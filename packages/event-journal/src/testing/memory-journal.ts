@@ -1,4 +1,4 @@
-import { EVENT_SCHEMA_VERSION, type EventDraft, OgbError, type SessionEvent } from "@vesper/contracts";
+import { EVENT_SCHEMA_VERSION, type EventDraft, OgbError, type SessionEvent } from "@standin/contracts";
 import type { EventJournal } from "../journal.ts";
 import { assertDraft, assertSessionId } from "../log-format.ts";
 import { followSession, Listeners } from "../subscription.ts";

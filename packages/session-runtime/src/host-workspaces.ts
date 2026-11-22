@@ -1,4 +1,4 @@
-import { type WorkspaceHost, workspaceIdFor } from "@vesper/contracts";
+import { type WorkspaceHost, workspaceIdFor } from "@standin/contracts";
 import { runInWorkspace, spawnInWorkspace, workspaceEnvironment } from "./run-command.ts";
 import type { WorkspaceInfo, WorkspaceProvider } from "./types.ts";
 

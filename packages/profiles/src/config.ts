@@ -1,4 +1,4 @@
-import { isJsonObject, OgbError } from "@vesper/contracts";
+import { isJsonObject, OgbError } from "@standin/contracts";
 import { SAFETY_FLOOR, type ProfileConfig, type ProfileDefinition } from "./types.ts";
 
 const NAME = /^[a-z0-9][a-z0-9-]*$/;

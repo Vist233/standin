@@ -1,4 +1,4 @@
-import { OgbError } from "@vesper/contracts";
+import { OgbError } from "@standin/contracts";
 import { afterEach, describe, expect, it } from "vitest";
 import { type GatewayRig, type RigOptions, startRig } from "./rig.ts";
 

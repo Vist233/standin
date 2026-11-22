@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import type { SessionEvent } from "@vesper/contracts";
+import type { SessionEvent } from "@standin/contracts";
 import { SECURITY_HEADERS } from "./http.ts";
 
 export interface StreamOptions {

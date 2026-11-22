@@ -2,8 +2,8 @@
 import { mkdtempSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createFakeGraph } from "@vesper/connectors/testing";
-import { isOgbError, type PluginContext, type SignalDraft } from "@vesper/contracts";
+import { createFakeGraph } from "@standin/connectors/testing";
+import { isOgbError, type PluginContext, type SignalDraft } from "@standin/contracts";
 import { afterEach, describe, expect, it } from "vitest";
 import { createOutlook } from "../src/outlook.ts";
 import { outlookFor } from "../src/shared.ts";

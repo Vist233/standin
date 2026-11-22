@@ -1,4 +1,4 @@
-import type { EventDraft, JsonValue, PauseReason, SessionErrorKind, ToolOutcome, ToolRef } from "@vesper/contracts";
+import type { EventDraft, JsonValue, PauseReason, SessionErrorKind, ToolOutcome, ToolRef } from "@standin/contracts";
 import type { Event, PauseReason as FrameworkPause, RunEndReason } from "sakura-agent";
 
 /** A copy of any value as plain JSON (undefined becomes null). */
@@ -39,7 +39,7 @@ function callPayload(call: { id: string; name: string; args?: unknown }): Record
   return payload;
 }
 
-/** The framework's end-of-run reasons in the page's words (the fixtures of `@vesper/contracts/testing` use these). */
+/** The framework's end-of-run reasons in the page's words (the fixtures of `@standin/contracts/testing` use these). */
 export function runReasonOf(reason: RunEndReason): string {
   return reason === "done" ? "end" : reason === "paused" ? "pause" : reason;
 }

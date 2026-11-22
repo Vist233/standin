@@ -1,4 +1,4 @@
-import { isOgbError } from "@vesper/contracts";
+import { isOgbError } from "@standin/contracts";
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import { parseProfileConfig, parseSessionRequest, resolveSession, SAFETY_FLOOR } from "../src/index.ts";

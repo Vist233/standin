@@ -1,5 +1,5 @@
 import { join } from "node:path";
-import { type MessageAttachment, OgbError, sanitizeFileName } from "@vesper/contracts";
+import { type MessageAttachment, OgbError, sanitizeFileName } from "@standin/contracts";
 
 /**
  * The files a message names, checked and given the path the agent's own tools see. The gateway has already checked them

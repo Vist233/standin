@@ -1,4 +1,4 @@
-import { OgbError } from "@vesper/contracts";
+import { OgbError } from "@standin/contracts";
 import type { Account, Provider } from "./types.ts";
 
 export type ProviderFactory<Context = unknown> = (account: Account, context: Context) => Provider | Promise<Provider>;

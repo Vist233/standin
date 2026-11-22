@@ -1,4 +1,4 @@
-import type { EventDraft, SessionEvent } from "@vesper/contracts";
+import type { EventDraft, SessionEvent } from "@standin/contracts";
 
 /**
  * The journal is the commit point of a session: an event exists once `append` has resolved, and then it

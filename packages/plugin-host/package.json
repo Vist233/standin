@@ -1,5 +1,5 @@
 {
-  "name": "@vesper/plugin-host",
+  "name": "@standin/plugin-host",
   "version": "0.0.1",
   "private": true,
   "type": "module",
@@ -10,7 +10,7 @@
     "./testing": "./src/testing/index.ts"
   },
   "dependencies": {
-    "@vesper/contracts": "*",
+    "@standin/contracts": "*",
     "sakura-agent": "0.2.3"
   }
 }

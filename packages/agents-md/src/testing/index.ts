@@ -1,5 +1,5 @@
-import { resolveSession } from "@vesper/profiles";
-import { sampleProfileConfig } from "@vesper/profiles/testing";
+import { resolveSession } from "@standin/profiles";
+import { sampleProfileConfig } from "@standin/profiles/testing";
 import type { AgentsMdInput } from "../render.ts";
 
 /** A complete input for a sample profile, for tests of anything that writes or reads the file. */

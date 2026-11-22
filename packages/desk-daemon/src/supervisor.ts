@@ -1,7 +1,7 @@
 import { type ChildProcess, execFileSync, spawn } from "node:child_process";
 import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import type { PluginLogger, ProcessHealth, ProcessState } from "@vesper/contracts";
+import type { PluginLogger, ProcessHealth, ProcessState } from "@standin/contracts";
 
 export interface Backoff {
   readonly initialMs: number;

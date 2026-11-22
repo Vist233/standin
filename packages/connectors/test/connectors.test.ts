@@ -1,4 +1,4 @@
-import { isOgbError, type SignalDraft, type SignalSink } from "@vesper/contracts";
+import { isOgbError, type SignalDraft, type SignalSink } from "@standin/contracts";
 import type { ToolContext } from "sakura-agent";
 import { describe, expect, it } from "vitest";
 import { createConnectorTools, createWatchSources, ProviderRegistry, untrusted } from "../src/index.ts";

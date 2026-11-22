@@ -1,5 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
-import type { ApprovalMode } from "@vesper/plugin-host";
+import type { ApprovalMode } from "@standin/plugin-host";
 import type { Tool } from "sakura-agent";
 import { text } from "./tool-result.ts";
 

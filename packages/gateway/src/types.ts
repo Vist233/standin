@@ -1,5 +1,5 @@
-import type { StartupLine, WorkspaceHost } from "@vesper/contracts";
-import type { SessionRuntime } from "@vesper/session-runtime";
+import type { StartupLine, WorkspaceHost } from "@standin/contracts";
+import type { SessionRuntime } from "@standin/session-runtime";
 
 /** The part of the session runtime the gateway uses. A fake with these methods is enough to test it. */
 /** A file the person attached to a message: it is already in the workspace's files directory. */

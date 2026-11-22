@@ -1,4 +1,4 @@
-import { OgbError } from "@vesper/contracts";
+import { OgbError } from "@standin/contracts";
 import type { CalendarEvent, MailMessage, MailQuery, Provider, Stop } from "../types.ts";
 
 export interface MemoryProvider extends Provider {

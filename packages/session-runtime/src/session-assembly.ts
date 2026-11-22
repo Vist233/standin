@@ -1,12 +1,12 @@
 import { existsSync } from "node:fs";
 import { mkdir, symlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { renderAgentsMd } from "@vesper/agents-md";
-import { CORE_TOOL_NAMES, OgbError, type Outgoing, type PluginContext, type SessionEvent, type SignalDraft } from "@vesper/contracts";
-import { createFileJournal, type EventJournal } from "@vesper/event-journal";
-import type { LoadedPlugin } from "@vesper/plugin-host";
-import type { ResolvedProfile } from "@vesper/profiles";
-import type { SessionRecord } from "@vesper/session-store";
+import { renderAgentsMd } from "@standin/agents-md";
+import { CORE_TOOL_NAMES, OgbError, type Outgoing, type PluginContext, type SessionEvent, type SignalDraft } from "@standin/contracts";
+import { createFileJournal, type EventJournal } from "@standin/event-journal";
+import type { LoadedPlugin } from "@standin/plugin-host";
+import type { ResolvedProfile } from "@standin/profiles";
+import type { SessionRecord } from "@standin/session-store";
 import { type Agent, corePlugins, createAgent, limitsPlugin } from "sakura-agent";
 import { SessionActor } from "./actor.ts";
 import { ApprovalBook, gate } from "./approvals.ts";

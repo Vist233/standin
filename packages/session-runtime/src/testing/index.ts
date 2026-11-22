@@ -1,12 +1,12 @@
 import { mkdirSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { RunOptions, RunResult } from "@vesper/contracts";
-import { createModelRegistry, parseModelConfig } from "@vesper/model-registry";
-import { createPluginHost, loadPluginDirectory, type LoadedPlugin } from "@vesper/plugin-host";
-import { parseProfileConfig } from "@vesper/profiles";
-import { createFakeSecrets } from "@vesper/secrets/testing";
-import { createFileSessionStore } from "@vesper/session-store";
+import type { RunOptions, RunResult } from "@standin/contracts";
+import { createModelRegistry, parseModelConfig } from "@standin/model-registry";
+import { createPluginHost, loadPluginDirectory, type LoadedPlugin } from "@standin/plugin-host";
+import { parseProfileConfig } from "@standin/profiles";
+import { createFakeSecrets } from "@standin/secrets/testing";
+import { createFileSessionStore } from "@standin/session-store";
 import type { FauxClient, FauxScript } from "sakura-agent/testing";
 import { createFauxClient } from "sakura-agent/testing";
 import { spawnInWorkspace, workspaceEnvironment } from "../run-command.ts";

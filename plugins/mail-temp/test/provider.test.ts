@@ -2,8 +2,8 @@
 import { mkdtempSync, readFileSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createFakeTempMail } from "@vesper/connectors/testing";
-import { OgbError, type PluginContext } from "@vesper/contracts";
+import { createFakeTempMail } from "@standin/connectors/testing";
+import { OgbError, type PluginContext } from "@standin/contracts";
 import { afterEach, describe, expect, it } from "vitest";
 import { mailboxName, providerFor } from "../src/provider.ts";
 

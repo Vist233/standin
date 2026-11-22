@@ -1,5 +1,5 @@
 // The temp-mail provider against a stand-in of a cloudflare_temp_email deployment: the shared contract, then what is particular to it.
-import { isOgbError } from "@vesper/contracts";
+import { isOgbError } from "@standin/contracts";
 import { describe, expect, it } from "vitest";
 import { createTempMailAddresses, createTempMailProvider } from "../src/index.ts";
 import { createFakeTempMail, providerContract } from "../src/testing/index.ts";

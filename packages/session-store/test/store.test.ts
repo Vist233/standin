@@ -1,6 +1,6 @@
 import { chmodSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { isOgbError } from "@vesper/contracts";
+import { isOgbError } from "@standin/contracts";
 import { afterEach, describe, expect, it } from "vitest";
 import { createFileSessionStore } from "../src/index.ts";
 import { createTempSessionStore } from "../src/testing/index.ts";

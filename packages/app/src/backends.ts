@@ -1,6 +1,6 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import type { StartupLine } from "@vesper/contracts";
+import type { StartupLine } from "@standin/contracts";
 
 /** Where agent-tools keeps the runners of the browser and computer tools (scripts/sync-agent-tools.sh copies it to vendor/). */
 const BROWSER_RUNNER = ["vendor", "agent-tools", "dist", "browser", "runner.js"];

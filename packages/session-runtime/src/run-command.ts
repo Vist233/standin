@@ -1,6 +1,6 @@
 import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
-import { OgbError, type RunOptions, type RunResult, type WorkspaceProcess } from "@vesper/contracts";
+import { OgbError, type RunOptions, type RunResult, type WorkspaceProcess } from "@standin/contracts";
 
 export interface WorkspaceTarget {
   workspaceId: string;

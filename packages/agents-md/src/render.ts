@@ -1,4 +1,4 @@
-import type { ResolvedProfile } from "@vesper/profiles";
+import type { ResolvedProfile } from "@standin/profiles";
 
 export interface AgentsMdInput {
   profile: ResolvedProfile;

@@ -1,4 +1,4 @@
-import type { Delivery, SignalDraft } from "@vesper/contracts";
+import type { Delivery, SignalDraft } from "@standin/contracts";
 import { describe, expect, it } from "vitest";
 import { priorityOf, Router, trustOf } from "../src/index.ts";
 

@@ -1,7 +1,7 @@
 import { chmodSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { CORE_TOOL_NAMES, isOgbError } from "@vesper/contracts";
+import { CORE_TOOL_NAMES, isOgbError } from "@standin/contracts";
 import { afterEach, describe, expect, it } from "vitest";
 import {
   createPluginHost,

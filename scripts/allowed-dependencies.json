@@ -1,5 +1,5 @@
 {
-  "comment": "The allowed-dependency table of docs/07 section 2. A package may import another package only through its public entry ('@vesper/x') and only if listed here. 'externals' lists the npm packages a package may import; node: built-ins are allowed everywhere except in 'contracts'. Test files may also import '@vesper/x/testing' for the packages in 'dependencies'. 'plugins.overrides' adds npm packages for one named plugin (the handoff plugin wraps the handoff library). 'testDependencies' lists packages that only test files and src/testing may import (the audit of 2026-11-13: the table lists what src really imports).",
+  "comment": "The allowed-dependency table of docs/07 section 2. A package may import another package only through its public entry ('@standin/x') and only if listed here. 'externals' lists the npm packages a package may import; node: built-ins are allowed everywhere except in 'contracts'. Test files may also import '@standin/x/testing' for the packages in 'dependencies'. 'plugins.overrides' adds npm packages for one named plugin (the handoff plugin wraps the handoff library). 'testDependencies' lists packages that only test files and src/testing may import (the audit of 2026-11-13: the table lists what src really imports).",
   "packages": {
     "contracts": {
       "dependencies": [],

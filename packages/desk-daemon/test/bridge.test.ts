@@ -1,5 +1,5 @@
 import { connect as netConnect, createServer, type Server, type Socket } from "node:net";
-import type { StreamMode } from "@vesper/contracts";
+import type { StreamMode } from "@standin/contracts";
 import { afterEach, describe, expect, it } from "vitest";
 import { type Bridge, type BridgeOptions, startBridge } from "../src/ws-bridge.ts";
 

@@ -1,4 +1,4 @@
-import { OgbError } from "@vesper/contracts";
+import { OgbError } from "@standin/contracts";
 import { getJson, openSession } from "./cdp.ts";
 
 const MAX_PER_WINDOW = 5;

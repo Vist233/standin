@@ -10,7 +10,7 @@ import {
   requestIdOf,
   type WorkspaceHost,
   type WorkspaceResponse,
-} from "@vesper/contracts";
+} from "@standin/contracts";
 
 export async function respond(host: WorkspaceHost, line: string): Promise<WorkspaceResponse> {
   try {

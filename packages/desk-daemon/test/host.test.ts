@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { isOgbError } from "@vesper/contracts";
+import { isOgbError } from "@standin/contracts";
 import { DeskHost } from "../src/host.ts";
 import { stubConfig } from "../src/testing/index.ts";
 import { alive, eventually, silentLog, tempRoot } from "./helpers.ts";

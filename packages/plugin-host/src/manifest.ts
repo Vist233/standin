@@ -1,4 +1,4 @@
-import { isJsonObject, type JsonValue, OgbError } from "@vesper/contracts";
+import { isJsonObject, type JsonValue, OgbError } from "@standin/contracts";
 
 const EFFECTS = ["read", "write", "exec", "network", "irreversible"] as const;
 export type Effect = (typeof EFFECTS)[number];

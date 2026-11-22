@@ -1,6 +1,6 @@
 import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
-import type { PluginLogger } from "@vesper/contracts";
+import type { PluginLogger } from "@standin/contracts";
 import { getJson, openSession } from "./cdp.ts";
 
 /** The cookie fields that are copied between browsers (what DevTools' Storage.getCookies returns and setCookies takes). */

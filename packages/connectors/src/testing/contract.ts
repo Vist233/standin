@@ -1,4 +1,4 @@
-import { isOgbError } from "@vesper/contracts";
+import { isOgbError } from "@standin/contracts";
 import { describe, expect, it } from "vitest";
 import type { CalendarEvent, MailSummary, Provider } from "../types.ts";
 

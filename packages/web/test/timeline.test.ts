@@ -1,4 +1,4 @@
-import { JOURNAL_FIXTURES } from "@vesper/contracts/testing";
+import { JOURNAL_FIXTURES } from "@standin/contracts/testing";
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import { applyEvent, createState, foldEvents, visible } from "../src/model.js";
@@ -258,6 +258,6 @@ describe("questionMarker and titleBadge", () => {
     expect(questionMarker({ kind: "user", seq: 1, at: 1, text: "x" } as any)).toBe("");
   });
   it("puts the count in the tab title only when something waits", () => {
-    expect([0, 1, 12, -1, Number.NaN, 1.5].map(titleBadge)).toEqual(["Vesper", "(1) Vesper", "(12) Vesper", "Vesper", "Vesper", "Vesper"]);
+    expect([0, 1, 12, -1, Number.NaN, 1.5].map(titleBadge)).toEqual(["StandIn", "(1) StandIn", "(12) StandIn", "StandIn", "StandIn", "StandIn"]);
   });
 });

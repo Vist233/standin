@@ -1,6 +1,6 @@
-<p align="center"><img src="assets/vesper-logo.jpeg" alt="Vesper" width="420" /></p>
+<p align="center"><img src="assets/vesper-logo.jpeg" alt="StandIn" width="420" /></p>
 
-# Vesper
+# StandIn
 
 A personal agent that works in its own computer. One Docker container runs your agent sessions; each session has its own Linux desktop and a real, headed Chromium. A local web page lets you chat with the agent, watch its browser live, and take over with your own mouse and keyboard when a site wants you to sign in, then hand it back. Logins are shared by all your sessions, so you sign in once.
 

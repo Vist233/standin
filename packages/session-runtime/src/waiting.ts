@@ -1,4 +1,4 @@
-import type { MessageAttachment, SessionEvent, TakeoverOpenedPayload } from "@vesper/contracts";
+import type { MessageAttachment, SessionEvent, TakeoverOpenedPayload } from "@standin/contracts";
 
 /** What the person's side of a session is doing, folded from the journal. The one place that knows how these events end. */
 export interface Waiting {

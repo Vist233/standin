@@ -1,5 +1,5 @@
 {
-  "name": "@vesper/app",
+  "name": "@standin/app",
   "version": "0.0.1",
   "private": true,
   "type": "module",
@@ -9,15 +9,15 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@vesper/connectors": "*",
-    "@vesper/contracts": "*",
-    "@vesper/gateway": "*",
-    "@vesper/model-registry": "*",
-    "@vesper/plugin-host": "*",
-    "@vesper/profiles": "*",
-    "@vesper/secrets": "*",
-    "@vesper/session-runtime": "*",
-    "@vesper/session-store": "*",
-    "@vesper/workspace-client": "*"
+    "@standin/connectors": "*",
+    "@standin/contracts": "*",
+    "@standin/gateway": "*",
+    "@standin/model-registry": "*",
+    "@standin/plugin-host": "*",
+    "@standin/profiles": "*",
+    "@standin/secrets": "*",
+    "@standin/session-runtime": "*",
+    "@standin/session-store": "*",
+    "@standin/workspace-client": "*"
   }
 }

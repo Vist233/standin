@@ -2,9 +2,9 @@ import { existsSync, mkdirSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import type { WorkspaceHost } from "@vesper/contracts";
-import { makeWritable } from "@vesper/plugin-host";
-import { createFakeWorkspaceHost } from "@vesper/workspace-client/testing";
+import type { WorkspaceHost } from "@standin/contracts";
+import { makeWritable } from "@standin/plugin-host";
+import { createFakeWorkspaceHost } from "@standin/workspace-client/testing";
 import { createApp } from "../src/app.ts";
 
 export const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");

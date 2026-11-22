@@ -3,7 +3,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
-import { createWorkspaceClient } from "@vesper/workspace-client";
+import { createWorkspaceClient } from "@standin/workspace-client";
 import { eventually, tempRoot } from "./helpers.ts";
 
 const main = fileURLToPath(new URL("../src/main.ts", import.meta.url));

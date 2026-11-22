@@ -1,7 +1,7 @@
 import { randomBytes } from "node:crypto";
 import { chmodSync, existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { OgbError } from "@vesper/contracts";
+import { OgbError } from "@standin/contracts";
 import type { Provider } from "../types.ts";
 import { createTempMailAddresses, createTempMailProvider, type ReadState, type TempMailSite } from "./temp-mail.ts";
 

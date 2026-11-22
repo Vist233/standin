@@ -1,4 +1,4 @@
-import { OgbError } from "@vesper/contracts";
+import { OgbError } from "@standin/contracts";
 import type { SecretProvider } from "./provider.ts";
 
 export interface EnvironmentProviderOptions {

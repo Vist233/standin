@@ -1,6 +1,6 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { isOgbError, type SessionEvent } from "@vesper/contracts";
+import { isOgbError, type SessionEvent } from "@standin/contracts";
 import { ProviderError } from "sakura-agent";
 import { afterEach, describe, expect, it } from "vitest";
 import { describeRunError, errorKindOf, JournalMapper, outcomeOf, retryableRun, toolRefOf } from "../src/events.ts";

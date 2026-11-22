@@ -1,4 +1,4 @@
-import { isJsonObject, OgbError } from "@vesper/contracts";
+import { isJsonObject, OgbError } from "@standin/contracts";
 import { SAFETY_FLOOR, type ProfileConfig, type ResolvedProfile, type SafetyPlugin, type SessionRequest } from "./types.ts";
 
 const REQUEST_KEYS = new Set<string>(["profile", "title", "model", "extraPlugins"]);

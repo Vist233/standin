@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { checkInsertText, isOgbError, OgbError, type SessionEvent, sanitizeFileName, type TakeoverTicket } from "@vesper/contracts";
-import { workspaceIdFor } from "@vesper/session-runtime";
+import { checkInsertText, isOgbError, OgbError, type SessionEvent, sanitizeFileName, type TakeoverTicket } from "@standin/contracts";
+import { workspaceIdFor } from "@standin/session-runtime";
 import { HttpFailure, readJsonObject, readRawBody, sendDownload, sendJson, textField } from "./http.ts";
 import { pump } from "./sse.ts";
 import type { TicketBook } from "./tickets.ts";

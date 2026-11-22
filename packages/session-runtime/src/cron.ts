@@ -1,4 +1,4 @@
-import { OgbError } from "@vesper/contracts";
+import { OgbError } from "@standin/contracts";
 
 /**
  * Five-field cron (minute hour day-of-month month day-of-week) in the process's time zone (the box's `TZ`). Fields take `*`, numbers,

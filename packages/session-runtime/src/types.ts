@@ -1,12 +1,12 @@
 import type { ReviewPolicy } from "./review-policy.ts";
 import type { WaitLimits } from "./waits.ts";
-import type { Channel, SecretResolver, WorkspaceHandle } from "@vesper/contracts";
-import type { EventJournal } from "@vesper/event-journal";
-import type { ModelRegistry } from "@vesper/model-registry";
-import type { PluginHost } from "@vesper/plugin-host";
-import type { ProfileConfig, SafetyPlugin } from "@vesper/profiles";
-import type { RouterOptions } from "@vesper/router";
-import type { SessionStore } from "@vesper/session-store";
+import type { Channel, SecretResolver, WorkspaceHandle } from "@standin/contracts";
+import type { EventJournal } from "@standin/event-journal";
+import type { ModelRegistry } from "@standin/model-registry";
+import type { PluginHost } from "@standin/plugin-host";
+import type { ProfileConfig, SafetyPlugin } from "@standin/profiles";
+import type { RouterOptions } from "@standin/router";
+import type { SessionStore } from "@standin/session-store";
 import type { Agent, AgentConfig, LlmClient, Plugin } from "sakura-agent";
 
 export interface WorkspaceInfo extends WorkspaceHandle {

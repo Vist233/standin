@@ -1,5 +1,5 @@
 {
-  "name": "@vesper/web",
+  "name": "@standin/web",
   "version": "0.0.1",
   "private": true,
   "type": "module",
@@ -12,6 +12,6 @@
     "./client": "./src/client.js"
   },
   "dependencies": {
-    "@vesper/contracts": "*"
+    "@standin/contracts": "*"
   }
 }

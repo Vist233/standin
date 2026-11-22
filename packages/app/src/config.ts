@@ -1,9 +1,9 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { OgbError } from "@vesper/contracts";
-import { type ModelConfig, parseModelConfig } from "@vesper/model-registry";
-import { type ProfileConfig, parseProfileConfig } from "@vesper/profiles";
-import type { SessionRuntimeDeps } from "@vesper/session-runtime";
+import { OgbError } from "@standin/contracts";
+import { type ModelConfig, parseModelConfig } from "@standin/model-registry";
+import { type ProfileConfig, parseProfileConfig } from "@standin/profiles";
+import type { SessionRuntimeDeps } from "@standin/session-runtime";
 import { type AppEnvironment, MODEL_KEY_VARIABLE } from "./environment.ts";
 
 /** The name the default model has in the registry and in the default profiles. */

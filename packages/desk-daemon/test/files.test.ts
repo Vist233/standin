@@ -1,7 +1,7 @@
 import { mkdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { MAX_FILE_BYTES } from "@vesper/contracts";
+import { MAX_FILE_BYTES } from "@standin/contracts";
 import { WorkspaceFiles } from "../src/files.ts";
 import { tempRoot } from "./helpers.ts";
 

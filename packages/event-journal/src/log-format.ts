@@ -1,4 +1,4 @@
-import { EVENT_SCHEMA_VERSION, isSessionEvent, OgbError, type SessionEvent } from "@vesper/contracts";
+import { EVENT_SCHEMA_VERSION, isSessionEvent, OgbError, type SessionEvent } from "@standin/contracts";
 
 export interface ParsedLog {
   events: SessionEvent[];

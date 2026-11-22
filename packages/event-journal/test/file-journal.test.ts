@@ -1,7 +1,7 @@
 import { appendFileSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { isOgbError } from "@vesper/contracts";
+import { isOgbError } from "@standin/contracts";
 import { afterEach, describe, expect, it } from "vitest";
 import { createFileJournal } from "../src/index.ts";
 import { journalContract } from "../src/testing/index.ts";

@@ -1,6 +1,6 @@
 import { rmSync } from "node:fs";
 import { createServer, type Server, type Socket } from "node:net";
-import { dispatch, encodeLine, LineReader, errorResponse, parseRequest, requestIdOf, type WorkspaceHost, type WorkspaceRequest } from "@vesper/contracts";
+import { dispatch, encodeLine, LineReader, errorResponse, parseRequest, requestIdOf, type WorkspaceHost, type WorkspaceRequest } from "@standin/contracts";
 
 export interface TestSocketServer {
   /** Closes every open connection (a daemon restart as the client sees it). */

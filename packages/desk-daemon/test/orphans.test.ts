@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { DeskHost } from "../src/host.ts";
 import { sweepStaleProcesses } from "../src/supervisor.ts";
-import { createWorkspaceClient } from "@vesper/workspace-client";
+import { createWorkspaceClient } from "@standin/workspace-client";
 import { stubConfig } from "../src/testing/index.ts";
 import { alive, eventually, silentLog, tempRoot } from "./helpers.ts";
 

@@ -2,7 +2,7 @@ import { createHash, timingSafeEqual } from "node:crypto";
 import { createServer, type IncomingMessage, type Server } from "node:http";
 import { connect, type Socket } from "node:net";
 import type { Duplex } from "node:stream";
-import type { StreamMode } from "@vesper/contracts";
+import type { StreamMode } from "@standin/contracts";
 import { RfbViewFilter } from "./rfb-filter.ts";
 import { encodeFrame, FrameParser } from "./ws-frame.ts";
 

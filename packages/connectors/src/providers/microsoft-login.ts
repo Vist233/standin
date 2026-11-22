@@ -1,6 +1,6 @@
 import { chmodSync, existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
-import { OgbError } from "@vesper/contracts";
+import { OgbError } from "@standin/contracts";
 
 /**
  * Signing in to a Microsoft account (Outlook.com, Microsoft 365) as a public client with the device code: no client secret, no redirect

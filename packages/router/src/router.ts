@@ -1,4 +1,4 @@
-import type { Delivery, Signal, SignalDraft, SignalPriority, SignalSource, Trust } from "@vesper/contracts";
+import type { Delivery, Signal, SignalDraft, SignalPriority, SignalSource, Trust } from "@standin/contracts";
 import { renderGroup } from "./render.ts";
 import type { RouterInput, RouterOptions, RouterOutput, RunState, SessionView } from "./types.ts";
 

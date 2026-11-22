@@ -1,5 +1,5 @@
 import { existsSync, rmSync } from "node:fs";
-import { type InstalledPlugin, installFromMarketplace, makeWritable, parseMarketplace } from "@vesper/plugin-host";
+import { type InstalledPlugin, installFromMarketplace, makeWritable, parseMarketplace } from "@standin/plugin-host";
 import { FIRST_PARTY_PLUGINS } from "./config.ts";
 
 export interface PluginInstall {

@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
-import { type JsonValue, OgbError } from "@vesper/contracts";
-import type { SessionStore } from "@vesper/session-store";
+import { type JsonValue, OgbError } from "@standin/contracts";
+import type { SessionStore } from "@standin/session-store";
 import { nextCron, parseCron, shortestGap } from "./cron.ts";
 import { parseQuiet } from "./heartbeat.ts";
 

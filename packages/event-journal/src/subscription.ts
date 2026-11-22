@@ -1,4 +1,4 @@
-import type { SessionEvent } from "@vesper/contracts";
+import type { SessionEvent } from "@standin/contracts";
 
 /** The set of live listeners of one session, plus a way to wake all of them when the journal closes. */
 export class Listeners {

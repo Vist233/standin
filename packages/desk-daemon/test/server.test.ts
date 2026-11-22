@@ -2,10 +2,10 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { connect } from "node:net";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { encodeLine, MAX_LINE_BYTES, parseResponse, WORKSPACE_PROTOCOL_VERSION } from "@vesper/contracts";
+import { encodeLine, MAX_LINE_BYTES, parseResponse, WORKSPACE_PROTOCOL_VERSION } from "@standin/contracts";
 import { respond, serveWorkspaceHost } from "../src/server.ts";
-import { createWorkspaceClient } from "@vesper/workspace-client";
-import { createFakeWorkspaceHost } from "@vesper/workspace-client/testing";
+import { createWorkspaceClient } from "@standin/workspace-client";
+import { createFakeWorkspaceHost } from "@standin/workspace-client/testing";
 import { tempRoot } from "./helpers.ts";
 
 let root: ReturnType<typeof tempRoot>;

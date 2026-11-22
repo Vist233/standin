@@ -1,5 +1,5 @@
-import { isOgbError } from "@vesper/contracts";
-import { createFakeSecrets } from "@vesper/secrets/testing";
+import { isOgbError } from "@standin/contracts";
+import { createFakeSecrets } from "@standin/secrets/testing";
 import { describe, expect, it } from "vitest";
 import { createModelRegistry, parseModelConfig } from "../src/index.ts";
 import { createFakeClientFactory } from "../src/testing/index.ts";

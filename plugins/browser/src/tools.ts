@@ -1,4 +1,4 @@
-import type { PluginContext } from "@vesper/contracts";
+import type { PluginContext } from "@standin/contracts";
 import type { Tool } from "sakura-agent";
 import { createBrowserTool } from "sakura-agent-tools/browser";
 

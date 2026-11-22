@@ -1,4 +1,4 @@
-import type { Channel, ChannelInbox, Outgoing } from "@vesper/contracts";
+import type { Channel, ChannelInbox, Outgoing } from "@standin/contracts";
 import { cursorIn } from "./event-source.ts";
 import type { MailReader, MailSender, Stop } from "./types.ts";
 

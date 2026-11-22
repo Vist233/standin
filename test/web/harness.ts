@@ -1,11 +1,11 @@
 import { mkdirSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { checkInsertText, type TakeoverTicket, type WorkspaceHost } from "@vesper/contracts";
-import { createGateway, type Gateway, type GatewayOptions } from "@vesper/gateway";
-import { createFakeRuntime, type FakeRuntime } from "@vesper/gateway/testing";
-import { workspaceIdFor } from "@vesper/session-runtime";
-import { createFakeWorkspaceHost, type FakeWorkspaceHost } from "@vesper/workspace-client/testing";
+import { checkInsertText, type TakeoverTicket, type WorkspaceHost } from "@standin/contracts";
+import { createGateway, type Gateway, type GatewayOptions } from "@standin/gateway";
+import { createFakeRuntime, type FakeRuntime } from "@standin/gateway/testing";
+import { workspaceIdFor } from "@standin/session-runtime";
+import { createFakeWorkspaceHost, type FakeWorkspaceHost } from "@standin/workspace-client/testing";
 import { type FakeDesktop, startFakeDesktop } from "./rfb-server.ts";
 
 export interface Harness {

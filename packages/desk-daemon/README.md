@@ -1,6 +1,6 @@
-# @vesper/desk-daemon
+# @standin/desk-daemon
 
-A separate process (`desk-daemon`) that owns the desktops of the box. It serves `WorkspaceHost` (see `@vesper/contracts`, `workspace-host.ts`) on a Unix socket, one JSON object per line. The runtime talks to it through `workspace-client`; it never links this code.
+A separate process (`desk-daemon`) that owns the desktops of the box. It serves `WorkspaceHost` (see `@standin/contracts`, `workspace-host.ts`) on a Unix socket, one JSON object per line. The runtime talks to it through `workspace-client`; it never links this code.
 
 **Interface (deep on purpose):** `ensure(spec)`, `destroy(id)`, `health(id)`, `takeover.open(id)`, `takeover.close(id)`. Every call is idempotent; `ensure` and `takeover.open` wake a stopped workspace; `health` and `destroy` never do.
 

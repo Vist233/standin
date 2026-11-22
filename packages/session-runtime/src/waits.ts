@@ -1,5 +1,5 @@
-import type { EventJournal } from "@vesper/event-journal";
-import type { SessionEvent } from "@vesper/contracts";
+import type { EventJournal } from "@standin/event-journal";
+import type { SessionEvent } from "@standin/contracts";
 import { waitingFrom } from "./waiting.ts";
 
 /** Optional limits on waiting for the person, in minutes. Unset means wait for ever. */

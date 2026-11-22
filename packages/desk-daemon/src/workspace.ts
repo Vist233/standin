@@ -8,7 +8,7 @@ import {
   type TakeoverTicket,
   type WorkspaceHealth,
   type WorkspaceInfo,
-} from "@vesper/contracts";
+} from "@standin/contracts";
 import { createBrowserProcess } from "./browser-proc.ts";
 import { type DaemonConfig, type SlotNumbers, slotNumbers } from "./config.ts";
 import { Display } from "./display.ts";

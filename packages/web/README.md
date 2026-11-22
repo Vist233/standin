@@ -1,6 +1,6 @@
-# @vesper/web
+# @standin/web
 
-The page: plain HTML, one stylesheet and a few ES modules. **No framework, no build step, no `innerHTML`**; the gateway serves `src/` as static files with a strict CSP. The page knows the gateway's API (`packages/gateway/README.md`) and the journal's event vocabulary (`@vesper/contracts`, `events.ts`), nothing else. noVNC 1.7.0 is vendored unchanged under `src/vendor/novnc` (see `ORIGIN.md` there) and loaded lazily when the desk opens.
+The page: plain HTML, one stylesheet and a few ES modules. **No framework, no build step, no `innerHTML`**; the gateway serves `src/` as static files with a strict CSP. The page knows the gateway's API (`packages/gateway/README.md`) and the journal's event vocabulary (`@standin/contracts`, `events.ts`), nothing else. noVNC 1.7.0 is vendored unchanged under `src/vendor/novnc` (see `ORIGIN.md` there) and loaded lazily when the desk opens.
 
 ## Files (all in `src/`, all served)
 | File | One reason to change | Needs a browser? |

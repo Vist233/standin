@@ -1,7 +1,7 @@
 import { mkdirSync, readdirSync, readFileSync, renameSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import type { CalendarEvent, MailMessage, MailQuery, MailSummary, Provider, Stop } from "@vesper/connectors";
-import { OgbError } from "@vesper/contracts";
+import type { CalendarEvent, MailMessage, MailQuery, MailSummary, Provider, Stop } from "@standin/connectors";
+import { OgbError } from "@standin/contracts";
 
 export interface MailboxOptions {
   /** The mailbox directory: `inbox/`, `sent/`, `calendar/` and `read.json` live in it. */

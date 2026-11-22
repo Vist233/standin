@@ -1,6 +1,6 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { isJsonObject, type JsonValue, OgbError } from "@vesper/contracts";
+import { isJsonObject, type JsonValue, OgbError } from "@standin/contracts";
 import { hashPluginDirectory, resolveInside } from "./files.ts";
 import { parseManifest, type PluginManifest } from "./manifest.ts";
 

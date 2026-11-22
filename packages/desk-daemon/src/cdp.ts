@@ -1,5 +1,5 @@
 import { request } from "node:http";
-import { OgbError } from "@vesper/contracts";
+import { OgbError } from "@standin/contracts";
 
 // The two DevTools calls the daemon makes into a workspace's browser: an HTTP GET of its JSON endpoints and one WebSocket
 // session. Errors say what failed, never what was sent (a typed password, a cookie value).

@@ -1,4 +1,4 @@
-# @vesper/gateway
+# @standin/gateway
 
 HTTP API, server-sent events with `Last-Event-ID`, a relay for the live browser view and the take-over desktop, and the static page. Thin on purpose: every route calls one method of the session runtime (or the workspace host) and returns; it knows no agent internals.
 
@@ -75,4 +75,4 @@ A browser cannot put a header on a WebSocket, and a long-lived token must not tr
 - At most 32 relays at once. When either side leaves, both are closed.
 
 ## Testing
-`@vesper/gateway/testing`: `createFakeRuntime` (in-memory, same contract for the parts the gateway uses), `startProbe` (an HTTP client that can set any Host header and read event streams), `startEchoUpgradeServer` (stands in for the desk-daemon's stream; can require a token). The tests also run the gateway over the real `session-runtime` with a scripted model.
+`@standin/gateway/testing`: `createFakeRuntime` (in-memory, same contract for the parts the gateway uses), `startProbe` (an HTTP client that can set any Host header and read event streams), `startEchoUpgradeServer` (stands in for the desk-daemon's stream; can require a token). The tests also run the gateway over the real `session-runtime` with a scripted model.

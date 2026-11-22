@@ -1,7 +1,7 @@
-import { OgbError, type SecretResolver } from "@vesper/contracts";
+import { OgbError, type SecretResolver } from "@standin/contracts";
 import { type ChatClientOptions, compatPresets, createChatClient, type LlmClient } from "sakura-agent";
 import type { ModelConfig, ModelEntry } from "./config.ts";
-import { isSecretReference } from "@vesper/secrets";
+import { isSecretReference } from "@standin/secrets";
 
 export interface ModelRegistry {
   names(): string[];

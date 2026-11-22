@@ -1,6 +1,6 @@
 import { request } from "node:http";
 import type { Socket } from "node:net";
-import { OgbError } from "@vesper/contracts";
+import { OgbError } from "@standin/contracts";
 import { afterEach, describe, expect, it } from "vitest";
 import { ensureWorkspace, type GatewayRig, type RigOptions, startRig } from "./rig.ts";
 

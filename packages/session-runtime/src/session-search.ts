@@ -1,4 +1,4 @@
-import type { SessionEvent } from "@vesper/contracts";
+import type { SessionEvent } from "@standin/contracts";
 import type { Tool } from "sakura-agent";
 import { textOf } from "./events.ts";
 import { text } from "./tool-result.ts";
